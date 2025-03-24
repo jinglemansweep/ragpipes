@@ -8,21 +8,28 @@ from langgraph.graph import START, StateGraph
 from typing_extensions import List, TypedDict
 from langchain.chat_models import init_chat_model
 from langchain_openai import OpenAIEmbeddings
-from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_postgres import PGVector
 
+ENABLE_LOADER = False
+SPLITTER_CHUNK_SIZE = 1000
+SPLITTER_CHUNK_OVERLAP = 200
 
 load_dotenv()
+
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST")
+POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
+POSTGRES_USER = os.environ.get("POSTGRES_USER")
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+POSTGRES_DB = os.environ.get("POSTGRES_DB")
+COLLECTION_NAME = os.environ.get("COLLECTION_NAME", "agent-docs")
 
 OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", "https://api.openai.com/v1")
 OPENAI_LLM_MODEL = os.environ.get("OPENAI_LLM_MODEL", "gpt-4o-mini")
 OPENAI_EMBEDDINGS_MODEL = os.environ.get(
     "OPENAI_EMBEDDINGS_MODEL", "text-embedding-3-large"
 )
-FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY")
 
-SPLITTER_CHUNK_SIZE = 1000
-SPLITTER_CHUNK_OVERLAP = 200
+FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY")
 
 
 class State(TypedDict):
@@ -38,12 +45,11 @@ def main():
     embeddings = OpenAIEmbeddings(model=OPENAI_EMBEDDINGS_MODEL)
 
     # Vector Store
-    connection = "postgresql+psycopg://langchain:langchain@localhost:5432/langchain"
-    collection_name = "agent-docs"
+    database_url = f"postgresql+psycopg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     vector_store = PGVector(
         embeddings=embeddings,
-        collection_name=collection_name,
-        connection=connection,
+        collection_name=COLLECTION_NAME,
+        connection=database_url,
         use_jsonb=True,
     )
 
@@ -52,14 +58,12 @@ def main():
         chunk_size=SPLITTER_CHUNK_SIZE, chunk_overlap=SPLITTER_CHUNK_OVERLAP
     )
 
-    # Loader
-    # loader = FireCrawlLoader(
-    #    api_key=FIRECRAWL_API_KEY, url="https://firecrawl.dev", mode="scrape"
-    # )
-    # splits = loader.load_and_split(text_splitter=text_splitter)
-
-    # Index chunks
-    # _ = vector_store.add_documents(documents=splits)
+    if ENABLE_LOADER:
+        loader = FireCrawlLoader(
+            api_key=FIRECRAWL_API_KEY, url="https://firecrawl.dev", mode="scrape"
+        )
+        splits = loader.load_and_split(text_splitter=text_splitter)
+        _ = vector_store.add_documents(documents=splits)
 
     # Define prompt for question-answering
     prompt = hub.pull("rlm/rag-prompt")
