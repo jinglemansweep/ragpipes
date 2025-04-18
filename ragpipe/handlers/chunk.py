@@ -13,15 +13,15 @@ class InputModel(MessageBody):
     chunk_overlap: int = Field(description="The overlap between chunks", default=200)
 
 
-def text_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageBody]:
+def chunk_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageBody]:
     payload = validate_payload(InputModel, _payload)
     if not payload:
         return None
-    logger.info(f"handler.text: payload={payload}")
+    logger.info(f"chunk.handle: payload={payload}")
 
     chunker = RecursiveCharacterTextSplitter(
         chunk_size=payload.chunk_size, chunk_overlap=payload.chunk_overlap
     )
     chunks = chunker.split_text(payload.data)
-    logger.info(f"text: chunks={chunks}")
+    logger.info(f"chunk.data: chunks={chunks}")
     return MessageBody(data=chunks, metadata=payload.metadata)

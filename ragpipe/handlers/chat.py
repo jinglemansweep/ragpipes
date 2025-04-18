@@ -26,7 +26,7 @@ def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageB
     payload = validate_payload(InputModel, _payload)
     if not payload:
         return None
-    logger.info(f"handler.chat: payload={payload}")
+    logger.info(f"chat.handler: payload={payload}")
 
     db_uri = f"postgresql+psycopg://{settings.pgvector.user}:{settings.pgvector.password}@{settings.pgvector.host}:{settings.pgvector.port}/{settings.pgvector.database}"
     vector_store = setup_vectorstore(
@@ -58,5 +58,5 @@ def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageB
     # Invoke graph with question
     response = graph.invoke({"question": payload.data})
 
-    logger.info(f"chat: response={response}")
+    logger.info(f"chat.data: response={response}")
     return MessageBody(data=response["answer"], metadata=payload.metadata)

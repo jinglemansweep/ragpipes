@@ -4,8 +4,10 @@ import paho.mqtt.client as mqtt
 from dynaconf import Dynaconf
 from .config import VALIDATORS
 from .handlers.chat import chat_handler
-from .handlers.text import text_handler
+from .handlers.chunk import chunk_handler
 from .handlers.vectorstore import vectorstore_handler
+from .handlers.loader_web import loader_web_handler
+from .handlers.loader_wikipedia import loader_wikipedia_handler
 from .utils import setup_logger
 
 settings = Dynaconf(
@@ -37,7 +39,7 @@ def on_connect(client, userdata, flags, reason_code, properties):
     logger.info(
         f"MQTT connected={connected} handler={settings.mqtt.handler} command_topic={settings.mqtt.topic_command} response_topic={settings.mqtt.topic_response}"
     )
-    client.subscribe(f"{settings.mqtt.topic_command}/#")
+    client.subscribe(f"{settings.mqtt.topic_command}")
 
 
 @mqttc.message_callback()
@@ -49,8 +51,14 @@ def on_message(client, userdata, msg):
         return
     response = None
 
-    if settings.mqtt.handler == "text":
-        response = text_handler(payload, settings)
+    if settings.mqtt.handler == "chunk":
+        response = chunk_handler(payload, settings)
+
+    elif settings.mqtt.handler == "loader.web":
+        response = loader_web_handler(payload, settings)
+
+    elif settings.mqtt.handler == "loader.wikipedia":
+        response = loader_wikipedia_handler(payload, settings)
 
     elif settings.mqtt.handler == "vectorstore":
         response = vectorstore_handler(payload, settings)

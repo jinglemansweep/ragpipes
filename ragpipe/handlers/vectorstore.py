@@ -16,7 +16,7 @@ def vectorstore_handler(
     payload = validate_payload(InputModel, _payload)
     if not payload:
         return None
-    logger.info(f"handler.vectorstore: payload={payload}")
+    logger.info(f"vectorstore.handler: payload={payload}")
 
     db_uri = f"postgresql+psycopg://{settings.pgvector.user}:{settings.pgvector.password}@{settings.pgvector.host}:{settings.pgvector.port}/{settings.pgvector.database}"
     vector_store = setup_vectorstore(
@@ -26,7 +26,7 @@ def vectorstore_handler(
     vector_store.add_texts(payload.data, [payload.metadata])
 
     logger.info(
-        f"vectorstore: collection={settings.pgvector.collection} added={len(payload.data)} metadata={payload.metadata}"
+        f"vectorstore.data: collection={settings.pgvector.collection} added={len(payload.data)}"
     )
 
     return MessageBody(
