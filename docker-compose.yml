@@ -2,8 +2,8 @@ services:
   pgvector:
     image: pgvector/pgvector:pg17
     environment:
-     POSTGRES_USER: langchain
-     POSTGRES_PASSWORD: langchain
-     POSTGRES_DB: langchain
+     POSTGRES_USER: pgvector
+     POSTGRES_PASSWORD: pgvector
+     POSTGRES_DB: pgvector
     ports:
       - "5432:5432"

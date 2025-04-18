@@ -1,0 +1,6 @@
+general:
+  log_level: info
+  device_id: 1234567890
+
+mqtt:
+  keepalive: 60

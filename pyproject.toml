@@ -17,4 +17,7 @@ dependencies = [
     "firecrawl-py>=1.15.0",
     "langchain-postgres>=0.0.13",
     "psycopg[binary]>=3.2.6",
+    "wikipedia>=1.4.0",
+    "dynaconf>=3.2.10",
+    "paho-mqtt>=2.1.0",
 ]
