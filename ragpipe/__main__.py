@@ -1,53 +1,30 @@
-from dynaconf import Dynaconf
-from langchain.chat_models import init_chat_model
-from langchain_openai import OpenAIEmbeddings
-from langchain_postgres import PGVector
-
 import json
+import logging
 import paho.mqtt.client as mqtt
-import pprint
-
+from dynaconf import Dynaconf
 from .config import VALIDATORS
-from .handlers import handler
+from .handlers.chat import chat_handler
+from .handlers.text import text_handler
+from .handlers.vectorstore import vectorstore_handler
+from .utils import setup_logger
 
 settings = Dynaconf(
     envvar_prefix="RAGPIPE",
     settings_files=["settings.yml", "secrets.yml"],
     validators=VALIDATORS,
+    merge_enabled=True,
+    load_dotenv=True,
 )
 
-print(settings.to_dict())
+setup_logger(settings.general.log_level)
 
-# =========
-# AI MODELS
-# =========
+logger = logging.getLogger(__name__)
 
-chat_model = init_chat_model(
-    model=settings.openai.chat_model,
-    temperature=settings.openai.temperature,
-    max_tokens=settings.openai.max_tokens,
-)
-embeddings = OpenAIEmbeddings(model=settings.openai.embedding_model)
-
-# ========
-# PGVECTOR
-# ========
-
-database_url = f"postgresql+psycopg://{settings.pgvector.user}:{settings.pgvector.password}@{settings.pgvector.host}:{settings.pgvector.port}/{settings.pgvector.database}"
-
-vector_store = PGVector(
-    connection=database_url,
-    collection_name=settings.pgvector.collection,
-    embeddings=embeddings,
-    async_mode=False,
-    use_jsonb=True,
-)
-
+logger.debug(f"settings: {settings.to_dict()}")
 
 # ===========
 # MQTT CLIENT
 # ===========
-
 
 mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 if settings.mqtt.username and settings.mqtt.password:
@@ -56,20 +33,38 @@ if settings.mqtt.username and settings.mqtt.password:
 
 @mqttc.connect_callback()
 def on_connect(client, userdata, flags, reason_code, properties):
-    print(f"Connected with result code {reason_code}")
-    client.subscribe("ragpipe/#")
+    connected = reason_code == 0
+    logger.info(
+        f"MQTT connected={connected} handler={settings.mqtt.handler} command_topic={settings.mqtt.topic_command} response_topic={settings.mqtt.topic_response}"
+    )
+    client.subscribe(f"{settings.mqtt.topic_command}/#")
 
 
 @mqttc.message_callback()
 def on_message(client, userdata, msg):
-    topic = msg.topic
-    payload = msg.payload.decode("utf-8")
     try:
-        json_payload = json.loads(payload)
+        payload = json.loads(msg.payload.decode("utf-8"))
     except json.JSONDecodeError:
         print(f"Invalid JSON payload: {payload}")
         return
-    return handler(topic, json_payload)
+    response = None
+
+    if settings.mqtt.handler == "text":
+        response = text_handler(payload, settings)
+
+    elif settings.mqtt.handler == "vectorstore":
+        response = vectorstore_handler(payload, settings)
+
+    elif settings.mqtt.handler == "chat":
+        response = chat_handler(payload, settings)
+
+    else:
+        logger.error(f"Unknown handler: {settings.mqtt.handler}")
+        return
+
+    if response:
+        logger.info(f"response: {response}")
+        mqttc.publish(f"{settings.mqtt.topic_response}", response.model_dump_json())
 
 
 mqttc.connect(

@@ -1,9 +1,23 @@
 general:
   log_level: info
-  device_id: 1234567890
 
 mqtt:
-  keepalive: 60
+  # broker: localhost
+  # port: 1883
+  # username: user
+  # password: password
+  # keepalive: 60
+  # handler: text
+  # topic_command: ragpipe/command
+  # topic_response: ragpipe/response
 
 pgvector:
-  collection: ragpipe
+  # host: localhost
+  # port: 5432
+  # user: pgvector
+  # password: pgvector
+  # database: pgvector
+  # collection: ragpipe
+
+openai:
+  # embedding_model: text-embedding-ada-002

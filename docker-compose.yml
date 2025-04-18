@@ -1,9 +1,72 @@
 services:
-  pgvector:
-    image: pgvector/pgvector:pg17
+  handler-text-default:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
-     POSTGRES_USER: pgvector
-     POSTGRES_PASSWORD: pgvector
-     POSTGRES_DB: pgvector
-    ports:
-      - "5432:5432"
+     - RAGPIPE_MQTT__HANDLER=text
+     - RAGPIPE_OPENAI__EMBEDDING_MODEL=text-embedding-ada-002
+     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/text/default/command
+     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunks/default
+
+  handler-text-testing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+     - RAGPIPE_MQTT__HANDLER=text
+     - RAGPIPE_OPENAI__EMBEDDING_MODEL=text-embedding-ada-002
+     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/text/testing/command
+     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunks/testing
+
+  handler-vectorstore-default:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+    - RAGPIPE_MQTT__HANDLER=vectorstore
+    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunks/default
+    - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/vectorstore/default/response
+    - RAGPIPE_PGVECTOR__COLLECTION=default
+
+  handler-vectorstore-testing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+    - RAGPIPE_MQTT__HANDLER=vectorstore
+    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunks/testing
+    - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/vectorstore/testing/response
+    - RAGPIPE_PGVECTOR__COLLECTION=testing
+
+  handler-chat-default:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+    - RAGPIPE_MQTT__HANDLER=chat
+    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chat/default/command
+    - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chat/default/response
+    - RAGPIPE_PGVECTOR__COLLECTION=default
+
+  handler-chat-testing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+    - RAGPIPE_MQTT__HANDLER=chat
+    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chat/testing/command
+    - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chat/testing/response
+    - RAGPIPE_PGVECTOR__COLLECTION=testing
