@@ -23,7 +23,6 @@ def loader_wikipedia_handler(
     logger.info(f"loader.wikipedia.handler: payload={payload}")
 
     docs = WikipediaLoader(query=payload.data, load_max_docs=payload.max_docs).load()
-
     body = "\n".join([doc.page_content for doc in docs])
 
     logger.info(f"loader.wikipedia.data: docs={len(docs)}")

@@ -24,15 +24,10 @@ def loader_web_handler(
     try:
         loader = WebBaseLoader(payload.data)
         docs = loader.load()
-        body = ""
-
-        for doc in docs:
-            fields = doc.model_dump()
-            content = clean_text_body(fields["page_content"])
-            body += f"{fields["metadata"]["title"]}: {content}\n\n"
-
-        logger.info(f"loader.web.data: docs={len(docs)}")
-        return MessageBody(data=body, metadata=payload.metadata)
+        fields = docs[0].model_dump()
+        content = clean_text_body(fields["page_content"])
+        logger.info(f"loader.web.data: doc={fields}")
+        return MessageBody(data=content, metadata=fields["metadata"] | payload.metadata)
     except Exception as e:
         logger.error(f"loader.web.handler: error={e}")
         return None
