@@ -21,6 +21,9 @@ VALIDATORS = [
     Validator("pgvector.password", default="postgres"),
     Validator("pgvector.database", default="postgres"),
     Validator("pgvector.collection", default="ragpipe"),
+    # CHUNKING
+    Validator("chunking.chunk_size", default=1000),
+    Validator("chunking.chunk_overlap", default=50),
     # OPENAI
     Validator("openai.chat_model", default="gpt-4o-mini"),
     Validator("openai.embedding_model", default="text-embedding-ada-002"),

@@ -31,6 +31,8 @@ services:
      - RAGPIPE_MQTT__HANDLER=chunk
      - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunk/alpha/command
      - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunk/alpha/response
+     - RAGPIPE_CHUNKER__CHUNK_SIZE=300
+     - RAGPIPE_CHUNKER__CHUNK_OVERLAP=30
 
   handler-chunk-beta:
     build:

@@ -3,7 +3,7 @@ from dynaconf import Dynaconf
 from langchain_community.document_loaders import WebBaseLoader
 
 # from pydantic import Field
-from .utils import MessageBody, validate_payload
+from .utils import MessageBody, validate_payload, clean_text_body
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -21,9 +21,18 @@ def loader_web_handler(
         return None
     logger.info(f"loader.web.handler: payload={payload}")
 
-    loader = WebBaseLoader(payload.data)
-    docs = loader.load()
-    body = "\n".join([doc.page_content for doc in docs])
+    try:
+        loader = WebBaseLoader(payload.data)
+        docs = loader.load()
+        body = ""
 
-    logger.info(f"loader.web.data: docs={len(docs)}")
-    return MessageBody(data=body, metadata=payload.metadata)
+        for doc in docs:
+            fields = doc.model_dump()
+            content = clean_text_body(fields["page_content"])
+            body += f"{fields["metadata"]["title"]}: {content}\n\n"
+
+        logger.info(f"loader.web.data: docs={len(docs)}")
+        return MessageBody(data=body, metadata=payload.metadata)
+    except Exception as e:
+        logger.error(f"loader.web.handler: error={e}")
+        return None

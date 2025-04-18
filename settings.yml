@@ -21,3 +21,7 @@ pgvector:
 
 openai:
   # embedding_model: text-embedding-ada-002
+
+chunking:
+  # chunk_size: 200
+  # chunk_overlap: 20

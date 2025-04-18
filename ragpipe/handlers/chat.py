@@ -38,7 +38,9 @@ def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageB
 
     # Define document retrieval stage
     def retrieve(state: State):
-        retrieved_docs = vector_store.similarity_search(state["question"])
+        retrieved_docs = vector_store.similarity_search(
+            state["question"], k=5, filter=payload.metadata
+        )
         return {"context": retrieved_docs}
 
     # Define document generation stage

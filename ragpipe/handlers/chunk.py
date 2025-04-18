@@ -1,7 +1,7 @@
 import logging
+import re
 from dynaconf import Dynaconf
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pydantic import Field
 from .utils import MessageBody, validate_payload
 from typing import Optional
 
@@ -9,19 +9,23 @@ logger = logging.getLogger(__name__)
 
 
 class InputModel(MessageBody):
-    chunk_size: int = Field(description="The size of each chunk", default=1000)
-    chunk_overlap: int = Field(description="The overlap between chunks", default=200)
+    pass
 
 
 def chunk_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageBody]:
     payload = validate_payload(InputModel, _payload)
     if not payload:
         return None
-    logger.info(f"chunk.handle: payload={payload}")
+
+    logger.info(
+        f"chunk.handler: payload={payload} chunk_size={settings.chunking.chunk_size} chunk_overlap={settings.chunking.chunk_overlap}"
+    )
 
     chunker = RecursiveCharacterTextSplitter(
-        chunk_size=payload.chunk_size, chunk_overlap=payload.chunk_overlap
+        chunk_size=settings.chunking.chunk_size,
+        chunk_overlap=settings.chunking.chunk_overlap,
     )
-    chunks = chunker.split_text(payload.data)
+    text = re.sub(r"(\n\s*)+\n", "\n\n", payload.data)
+    chunks = chunker.split_text(text)
     logger.info(f"chunk.data: chunks={chunks}")
     return MessageBody(data=chunks, metadata=payload.metadata)
