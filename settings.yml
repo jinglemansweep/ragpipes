@@ -4,3 +4,6 @@ general:
 
 mqtt:
   keepalive: 60
+
+pgvector:
+  collection: ragpipe
