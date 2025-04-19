@@ -5,6 +5,14 @@
 
 RAGPipes is a container based MQTT driven RAG (Retrieval-Augmented Generation) pipeline framework. Consisting of several primitive node types (e.g. `Loader`, `Chunker`, `VectorStore`) each run as an individual container with its own configuration, provided using environment variables. The nodes are connected using MQTT topics, also specified using environment variables.
 
+             +--------+     +---------+     +--------+
+    MQTT --> | Loader | --> | Chunker | --> | Vector |
+             +--------+     +---------+     +--------+
+                                                 |
+             +--------+                          |
+    MQTT --> |  Chat  | <------------------------+
+             +--------+
+
 ## Features
 
 - **Modular**: Each node is a separate container, making it easy to scale and manage.
