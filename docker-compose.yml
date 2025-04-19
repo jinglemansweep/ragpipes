@@ -38,7 +38,22 @@ services:
     environment:
      - RAGPIPES_MQTT__HANDLER=loader.text
      - RAGPIPES_MQTT__TOPIC_IN=ragpipes/loader/text/command
-     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command,ragpipes/translate/de/command
+     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command
+
+  loader-sitemap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+    networks:
+      - ragpipes
+    env_file:
+      - .env
+    environment:
+     - RAGPIPES_MQTT__HANDLER=loader.sitemap
+     - RAGPIPES_MQTT__TOPIC_IN=ragpipes/loader/sitemap/command
+     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command
 
   loader-web:
     build:
@@ -53,7 +68,7 @@ services:
     environment:
      - RAGPIPES_MQTT__HANDLER=loader.web
      - RAGPIPES_MQTT__TOPIC_IN=ragpipes/loader/web/command
-     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command,ragpipes/translate/de/command
+     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command
 
   loader-wikipedia:
     build:

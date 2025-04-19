@@ -87,8 +87,10 @@ def handler(
         for doc in response["context"][:2]
     ]
 
-    outputs = dict(answer=answer, context=context)
+    docs = [Document(page_content=answer, metadata=payload.metadata)]
+
+    outputs = dict(context=context)
     logger.info(
         f"chat.response: answer='{answer}' context_count={len(context)}"
     )
-    return MessageBody(outputs=outputs, metadata=payload.metadata)
+    return MessageBody(docs=docs, outputs=outputs, metadata=payload.metadata)

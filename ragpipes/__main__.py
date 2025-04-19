@@ -10,6 +10,7 @@ from dynaconf import Dynaconf
 from .config import VALIDATORS
 from .handlers.chat import handler as chat_handler
 from .handlers.chunker import handler as chunker_handler
+from .handlers.loader_sitemap import handler as loader_sitemap_handler
 from .handlers.loader_text import handler as loader_text_handler
 from .handlers.loader_web import handler as loader_web_handler
 from .handlers.loader_wikipedia import handler as loader_wikipedia_handler
@@ -57,6 +58,7 @@ def on_connect(client, userdata, flags, reason_code, properties):
 
 HANDLERS = {
     "chunker": chunker_handler,
+    "loader.sitemap": loader_sitemap_handler,
     "loader.text": loader_text_handler,
     "loader.web": loader_web_handler,
     "loader.wikipedia": loader_wikipedia_handler,
