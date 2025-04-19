@@ -32,6 +32,67 @@ You can inspect what is happening by subscribing to the root MQTT topic:
 
     mosquitto_sub -h localhost -t "ragpipes/#"
 
+### Pipelines
+
+The pipelines are defined in the `docker-compose.yml` file. Each pipeline node is a separate service that listens to a specific MQTT topic and publishes to another topic. This is achieved by setting the `RAGPIPES_MQTT__HANDLER` environment variable to the name of the node type and the `RAGPIPES_MQTT__TOPIC_COMMAND` and `RAGPIPES_MQTT__TOPIC_RESPONSE` environment variables to the MQTT topics to listen to and publish to.
+
+For example:
+
+- The **web loader** node can listen to the `ragpipes/loaders/web/command` topic and publish to the `ragpipes/chunker/default/command` topic.
+- The **chunker** node can listen to the `ragpipes/chunker/default/command` topic and publish to the `ragpipes/chunker/default/response` topic.
+- The **vector store** node can listen to the `ragpipes/chunker/default/response` topic, and after persisting the chunked response in the underlying vector store engine, it publishes the status to the `ragpipes/vectorstore/default/response` topic.
+- The **chat** node can listen to the `ragpipes/chat/default/command` topic and publish to the `ragpipes/chat/default/response` topic. Each chat node must be configured with the vector store configuration it should use to retrieve the documents.
+
+Docker Compose Example:
+
+    services:
+
+      loader-web:
+        build:
+          context: .
+          dockerfile: Dockerfile
+          env_file:
+            - .env
+        environment:
+         - RAGPIPES_MQTT__HANDLER=loader.web
+         - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/web/command
+         - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/command
+
+     chunker-default:
+        build:
+          context: .
+          dockerfile: Dockerfile
+          env_file:
+            - .env
+        environment:
+         - RAGPIPES_MQTT__HANDLER=chunker
+         - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/default/command
+         - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/response
+
+    vectorstore-default:
+        build:
+          context: .
+          dockerfile: Dockerfile
+          env_file:
+            - .env
+        environment:
+         - RAGPIPES_MQTT__HANDLER=vectorstore
+         - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/default/response
+         - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/vectorstore/default/response
+         - RAGPIPES_PGVECTOR__COLLECTION=my_collection
+
+    chat-default:
+       build:
+          context: .
+          dockerfile: Dockerfile
+          env_file:
+            - .env
+        environment:
+         - RAGPIPES_MQTT__HANDLER=chat
+         - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chat/default/command
+         - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chat/default/response
+         - RAGPIPES_PGVECTOR__COLLECTION=my_collection
+
 ### MQTT Examples
 
     mosquitto_pub -h localhost -t "<TOPIC>" -m '{"data": <COMMAND>, "metadata": <METADATA>}'
