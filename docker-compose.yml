@@ -5,7 +5,7 @@ services:
     networks:
      - ragpipes
     volumes:
-      - ./resources/mosquitto/config:/mosquitto/config
+      - ./resources/mosquitto/config:/mosquitto/config:ro
       - mosquitto_data:/mosquitto/data
       - mosquitto_log:/mosquitto/log
     ports:
