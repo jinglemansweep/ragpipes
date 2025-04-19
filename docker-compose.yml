@@ -10,6 +10,7 @@ services:
      - RAGPIPES_MQTT__HANDLER=loader.web
      - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/web/command
      - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
+
   handler-loader-wikipedia:
     build:
       context: .
