@@ -1,5 +1,17 @@
 services:
 
+
+  handler-loader-text:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+     - RAGPIPES_MQTT__HANDLER=loader.text
+     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/text/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
+
   handler-loader-web:
     build:
       context: .

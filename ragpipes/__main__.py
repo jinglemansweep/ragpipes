@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 import json
 import logging
+
 import paho.mqtt.client as mqtt
 from dynaconf import Dynaconf
+
 from .config import VALIDATORS
 from .handlers.chat import chat_handler
 from .handlers.chunker import chunker_handler
-from .handlers.vectorstore import vectorstore_handler
+from .handlers.loader_text import loader_text_handler
 from .handlers.loader_web import loader_web_handler
 from .handlers.loader_wikipedia import loader_wikipedia_handler
+from .handlers.vectorstore import vectorstore_handler
 from .utils import setup_logger
 
 
@@ -26,10 +31,6 @@ logger = logging.getLogger(__name__)
 
 logger.debug(f"settings: {settings.to_dict()}")
 
-# ===========
-# MQTT CLIENT
-# ===========
-
 mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 if settings.mqtt.username and settings.mqtt.password:
     mqttc.username_pw_set(settings.mqtt.username, settings.mqtt.password)
@@ -46,6 +47,7 @@ def on_connect(client, userdata, flags, reason_code, properties):
 
 HANDLERS = {
     "chunker": chunker_handler,
+    "loader.text": loader_text_handler,
     "loader.web": loader_web_handler,
     "loader.wikipedia": loader_wikipedia_handler,
     "vectorstore": vectorstore_handler,
@@ -73,7 +75,9 @@ def on_message(client, userdata, msg):
 
         if response:
             logger.debug(f"response: {response}")
-            mqttc.publish(f"{settings.mqtt.topic_response}", response.model_dump_json())
+            mqttc.publish(
+                f"{settings.mqtt.topic_response}", response.model_dump_json()
+            )
 
     except Exception as e:
         logger.error(f"Error processing message: {e}")
