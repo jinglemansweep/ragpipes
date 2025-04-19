@@ -1,7 +1,7 @@
 [project]
-name = "ai-agent"
+name = "ragpipes"
 version = "0.1.0"
-description = "Add your description here"
+description = "MQTT container based RAG pipelines"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -21,4 +21,5 @@ dependencies = [
     "dynaconf>=3.2.10",
     "paho-mqtt>=2.1.0",
     "beautifulsoup4>=4.13.3",
+    "flake8>=7.2.0",
 ]

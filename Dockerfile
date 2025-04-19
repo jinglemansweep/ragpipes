@@ -8,4 +8,4 @@ WORKDIR /app/
 
 RUN . /venv/bin/activate && uv sync --frozen
 
-CMD ["uv", "run", "-m", "ragpipe"]
+CMD ["uv", "run", "-m", "ragpipes"]

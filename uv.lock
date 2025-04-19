@@ -17,49 +17,6 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "ai-agent"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "beautifulsoup4" },
-    { name = "bs4" },
-    { name = "dynaconf" },
-    { name = "firecrawl-py" },
-    { name = "langchain", extra = ["openai"] },
-    { name = "langchain-community" },
-    { name = "langchain-core" },
-    { name = "langchain-google-vertexai" },
-    { name = "langchain-openai" },
-    { name = "langchain-postgres" },
-    { name = "langchain-text-splitters" },
-    { name = "langgraph" },
-    { name = "paho-mqtt" },
-    { name = "psycopg", extra = ["binary"] },
-    { name = "python-dotenv" },
-    { name = "wikipedia" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "beautifulsoup4", specifier = ">=4.13.3" },
-    { name = "bs4", specifier = ">=0.0.2" },
-    { name = "dynaconf", specifier = ">=3.2.10" },
-    { name = "firecrawl-py", specifier = ">=1.15.0" },
-    { name = "langchain", extras = ["openai"], specifier = ">=0.3.21" },
-    { name = "langchain-community", specifier = ">=0.3.20" },
-    { name = "langchain-core", specifier = ">=0.3.48" },
-    { name = "langchain-google-vertexai", specifier = ">=2.0.16" },
-    { name = "langchain-openai", specifier = ">=0.3.10" },
-    { name = "langchain-postgres", specifier = ">=0.0.13" },
-    { name = "langchain-text-splitters", specifier = ">=0.3.7" },
-    { name = "langgraph", specifier = ">=0.3.19" },
-    { name = "paho-mqtt", specifier = ">=2.1.0" },
-    { name = "psycopg", extras = ["binary"], specifier = ">=3.2.6" },
-    { name = "python-dotenv", specifier = ">=1.0.1" },
-    { name = "wikipedia", specifier = ">=1.4.0" },
-]
-
-[[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"
 source = { registry = "https://pypi.org/simple" }
@@ -335,6 +292,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/cf/70/44798abbdba2e7d0a330ab31b32b27bf830bd47d1b6fdfa692f615482e96/firecrawl_py-1.15.0.tar.gz", hash = "sha256:8136968d51a43b40ba3114630997c3a0ca12cdd817855cd9332163327630fff0", size = 21120 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cd/af/7e0cde1ec66bac63e90e54f38675b0e71be02b6c6194705c425ec0c52b3e/firecrawl_py-1.15.0-py3-none-any.whl", hash = "sha256:a7e0496978b048316dba0e87a8c43dc39f36c6390c7b467a41a538fc65181a7c", size = 34859 },
+]
+
+[[package]]
+name = "flake8"
+version = "7.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "mccabe" },
+    { name = "pycodestyle" },
+    { name = "pyflakes" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e7/c4/5842fc9fc94584c455543540af62fd9900faade32511fab650e9891ec225/flake8-7.2.0.tar.gz", hash = "sha256:fa558ae3f6f7dbf2b4f22663e5343b6b6023620461f8d4ff2019ef4b5ee70426", size = 48177 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/flake8-7.2.0-py2.py3-none-any.whl", hash = "sha256:93b92ba5bdb60754a6da14fa3b93a9361fd00a59632ada61fd7b130436c40343", size = 57786 },
 ]
 
 [[package]]
@@ -960,6 +931,15 @@ wheels = [
 ]
 
 [[package]]
+name = "mccabe"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e7/ff/0ffefdcac38932a54d2b5eed4e0ba8a408f215002cd178ad1df0f2806ff8/mccabe-0.7.0.tar.gz", hash = "sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325", size = 9658 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/27/1a/1f68f9ba0c207934b35b86a8ca3aad8395a3d6dd7921c0686e23853ff5a9/mccabe-0.7.0-py2.py3-none-any.whl", hash = "sha256:6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e", size = 7350 },
+]
+
+[[package]]
 name = "msgpack"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1374,6 +1354,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pycodestyle"
+version = "2.13.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/6e/1f4a62078e4d95d82367f24e685aef3a672abfd27d1a868068fed4ed2254/pycodestyle-2.13.0.tar.gz", hash = "sha256:c8415bf09abe81d9c7f872502a6eee881fbe85d8763dd5b9924bb0a01d67efae", size = 39312 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/be/b00116df1bfb3e0bb5b45e29d604799f7b91dd861637e4d448b4e09e6a3e/pycodestyle-2.13.0-py2.py3-none-any.whl", hash = "sha256:35863c5974a271c7a726ed228a14a4f6daf49df369d8c50cd9a6f58a5e143ba9", size = 31424 },
+]
+
+[[package]]
 name = "pycparser"
 version = "2.22"
 source = { registry = "https://pypi.org/simple" }
@@ -1449,6 +1438,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pyflakes"
+version = "3.3.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/af/cc/1df338bd7ed1fa7c317081dcf29bf2f01266603b301e6858856d346a12b3/pyflakes-3.3.2.tar.gz", hash = "sha256:6dfd61d87b97fba5dcfaaf781171ac16be16453be6d816147989e7f6e6a9576b", size = 64175 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/15/40/b293a4fa769f3b02ab9e387c707c4cbdc34f073f945de0386107d4e669e6/pyflakes-3.3.2-py2.py3-none-any.whl", hash = "sha256:5039c8339cbb1944045f4ee5466908906180f13cc99cc9949348d10f82a5c32a", size = 63164 },
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
@@ -1493,6 +1491,51 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/fe/0f/25911a9f080464c59fab9027482f822b86bf0608957a5fcc6eaac85aa515/PyYAML-6.0.2-cp313-cp313-musllinux_1_1_x86_64.whl", hash = "sha256:68ccc6023a3400877818152ad9a1033e3db8625d899c72eacb5a668902e4d652", size = 751597 },
     { url = "https://files.pythonhosted.org/packages/14/0d/e2c3b43bbce3cf6bd97c840b46088a3031085179e596d4929729d8d68270/PyYAML-6.0.2-cp313-cp313-win32.whl", hash = "sha256:bc2fa7c6b47d6bc618dd7fb02ef6fdedb1090ec036abab80d4681424b84c1183", size = 140527 },
     { url = "https://files.pythonhosted.org/packages/fa/de/02b54f42487e3d3c6efb3f89428677074ca7bf43aae402517bc7cca949f3/PyYAML-6.0.2-cp313-cp313-win_amd64.whl", hash = "sha256:8388ee1976c416731879ac16da0aff3f63b286ffdd57cdeb95f3f2e085687563", size = 156446 },
+]
+
+[[package]]
+name = "ragpipes"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "bs4" },
+    { name = "dynaconf" },
+    { name = "firecrawl-py" },
+    { name = "flake8" },
+    { name = "langchain", extra = ["openai"] },
+    { name = "langchain-community" },
+    { name = "langchain-core" },
+    { name = "langchain-google-vertexai" },
+    { name = "langchain-openai" },
+    { name = "langchain-postgres" },
+    { name = "langchain-text-splitters" },
+    { name = "langgraph" },
+    { name = "paho-mqtt" },
+    { name = "psycopg", extra = ["binary"] },
+    { name = "python-dotenv" },
+    { name = "wikipedia" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "beautifulsoup4", specifier = ">=4.13.3" },
+    { name = "bs4", specifier = ">=0.0.2" },
+    { name = "dynaconf", specifier = ">=3.2.10" },
+    { name = "firecrawl-py", specifier = ">=1.15.0" },
+    { name = "flake8", specifier = ">=7.2.0" },
+    { name = "langchain", extras = ["openai"], specifier = ">=0.3.21" },
+    { name = "langchain-community", specifier = ">=0.3.20" },
+    { name = "langchain-core", specifier = ">=0.3.48" },
+    { name = "langchain-google-vertexai", specifier = ">=2.0.16" },
+    { name = "langchain-openai", specifier = ">=0.3.10" },
+    { name = "langchain-postgres", specifier = ">=0.0.13" },
+    { name = "langchain-text-splitters", specifier = ">=0.3.7" },
+    { name = "langgraph", specifier = ">=0.3.19" },
+    { name = "paho-mqtt", specifier = ">=2.1.0" },
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.2.6" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "wikipedia", specifier = ">=1.4.0" },
 ]
 
 [[package]]

@@ -5,7 +5,7 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pydantic import field_validator
 from .utils import MessageBody, validate_payload
-from typing import Any, Dict, Optional
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 

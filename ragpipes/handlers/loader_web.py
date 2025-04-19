@@ -1,5 +1,4 @@
 import logging
-import uuid
 from dynaconf import Dynaconf
 from langchain_community.document_loaders import WebBaseLoader
 from pydantic import field_validator
@@ -36,7 +35,7 @@ def loader_web_handler(
 
     url = payload.data["url"]
 
-    logger.info(f"loader.web.handler: url={url} metadata={payload.metadata}")
+    logger.info(f"loader.web.handler: url='{url}' metadata={payload.metadata}")
 
     try:
 

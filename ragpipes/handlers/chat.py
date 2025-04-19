@@ -45,7 +45,7 @@ def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageB
         return None
     print(payload)
     query = payload.data["query"]
-    logger.info(f"chat.handler: query={query} metadata={payload.metadata}")
+    logger.info(f"chat.handler: query='{query}' metadata={payload.metadata}")
 
     db_uri = f"postgresql+psycopg://{settings.pgvector.user}:{settings.pgvector.password}@{settings.pgvector.host}:{settings.pgvector.port}/{settings.pgvector.database}"
 
@@ -86,5 +86,5 @@ def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageB
         for doc in response["context"][:2]
     ]
     data = dict(answer=answer, context=context)
-    logger.info(f"chat.response: answer={answer} context_count={len(context)}")
+    logger.info(f"chat.response: answer='{answer}' context_count={len(context)}")
     return OutputModel(data=data, metadata=payload.metadata)

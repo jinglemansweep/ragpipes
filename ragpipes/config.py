@@ -1,6 +1,6 @@
 from dynaconf import Validator
 
-# Env Var Format: RAGPIPE_GENERAL__LOG_LEVEL, RAGPIPE_MQTT__BROKER, RAGPIPE_PGVECTOR__HOST, etc.
+# Env Var Format: RAGPIPES_GENERAL__LOG_LEVEL, RAGPIPES_MQTT__BROKER, RAGPIPES_PGVECTOR__HOST, etc.
 
 VALIDATORS = [
     # GENERAL
@@ -11,8 +11,8 @@ VALIDATORS = [
     Validator("mqtt.keepalive", default=60, cast=int),
     Validator("mqtt.username", default=None),
     Validator("mqtt.password", default=None),
-    Validator("mqtt.topic_command", default="ragpipe/command"),
-    Validator("mqtt.topic_response", default="ragpipe/response"),
+    Validator("mqtt.topic_command", default=None),
+    Validator("mqtt.topic_response", default=None),
     Validator("mqtt.handler", default=None),
     # PGVECTOR
     Validator("pgvector.host", default="localhost"),
@@ -22,8 +22,8 @@ VALIDATORS = [
     Validator("pgvector.database", default="postgres"),
     Validator("pgvector.collection", default="ragpipe"),
     # CHUNKING
-    Validator("chunking.chunk_size", default=1000),
-    Validator("chunking.chunk_overlap", default=50),
+    Validator("chunker.chunk_size", default=1000),
+    Validator("chunker.chunk_overlap", default=50),
     # OPENAI
     Validator("openai.chat_model", default="gpt-4o-mini"),
     Validator("openai.embedding_model", default="text-embedding-ada-002"),

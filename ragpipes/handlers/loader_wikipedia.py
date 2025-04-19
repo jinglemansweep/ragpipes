@@ -1,8 +1,7 @@
 import logging
-import uuid
 from dynaconf import Dynaconf
 from langchain_community.document_loaders import WikipediaLoader
-from pydantic import Field, field_validator
+from pydantic import field_validator
 from .utils import MessageBody, validate_payload
 from typing import Optional
 
@@ -36,7 +35,9 @@ def loader_wikipedia_handler(
         return None
 
     query = payload.data["query"]
-    logger.info(f"loader.wikipedia.handler: query={query}")
+    logger.info(
+        f"loader.wikipedia.handler: query='{query}' metadata={payload.metadata}"
+    )
 
     docs = WikipediaLoader(query=query, load_max_docs=3).load()
 

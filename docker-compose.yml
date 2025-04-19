@@ -7,9 +7,9 @@ services:
     env_file:
       - .env
     environment:
-     - RAGPIPE_MQTT__HANDLER=loader.web
-     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/loader/web/command
-     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunker/alpha/command
+     - RAGPIPES_MQTT__HANDLER=loader.web
+     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/web/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
   handler-loader-wikipedia:
     build:
       context: .
@@ -17,9 +17,9 @@ services:
     env_file:
       - .env
     environment:
-     - RAGPIPE_MQTT__HANDLER=loader.wikipedia
-     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/loader/wikipedia/command
-     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunker/alpha/command
+     - RAGPIPES_MQTT__HANDLER=loader.wikipedia
+     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/wikipedia/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
 
   handler-chunker-alpha:
     build:
@@ -28,11 +28,11 @@ services:
     env_file:
       - .env
     environment:
-     - RAGPIPE_MQTT__HANDLER=chunker
-     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunker/alpha/command
-     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunker/alpha/response
-     - RAGPIPE_CHUNKER__CHUNK_SIZE=300
-     - RAGPIPE_CHUNKER__CHUNK_OVERLAP=30
+     - RAGPIPES_MQTT__HANDLER=chunker
+     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/alpha/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/response
+     - RAGPIPES_CHUNKER__CHUNK_SIZE=300
+     - RAGPIPES_CHUNKER__CHUNK_OVERLAP=30
 
   handler-chunker-beta:
     build:
@@ -41,9 +41,9 @@ services:
     env_file:
       - .env
     environment:
-     - RAGPIPE_MQTT__HANDLER=chunker
-     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunker/beta/command
-     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunker/beta/response
+     - RAGPIPES_MQTT__HANDLER=chunker
+     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/beta/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/beta/response
 
   handler-vectorstore-alpha:
     build:
@@ -52,10 +52,10 @@ services:
     env_file:
       - .env
     environment:
-    - RAGPIPE_MQTT__HANDLER=vectorstore
-    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunker/alpha/response
-    - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/vectorstore/alpha/response
-    - RAGPIPE_PGVECTOR__COLLECTION=alpha
+    - RAGPIPES_MQTT__HANDLER=vectorstore
+    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/alpha/response
+    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/vectorstore/alpha/response
+    - RAGPIPES_PGVECTOR__COLLECTION=alpha
 
   handler-vectorstore-beta:
     build:
@@ -64,10 +64,10 @@ services:
     env_file:
       - .env
     environment:
-    - RAGPIPE_MQTT__HANDLER=vectorstore
-    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunker/beta/response
-    - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/vectorstore/beta/response
-    - RAGPIPE_PGVECTOR__COLLECTION=beta
+    - RAGPIPES_MQTT__HANDLER=vectorstore
+    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/beta/response
+    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/vectorstore/beta/response
+    - RAGPIPES_PGVECTOR__COLLECTION=beta
 
   handler-chat-alpha:
     build:
@@ -76,10 +76,10 @@ services:
     env_file:
       - .env
     environment:
-    - RAGPIPE_MQTT__HANDLER=chat
-    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chat/alpha/command
-    - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chat/alpha/response
-    - RAGPIPE_PGVECTOR__COLLECTION=alpha
+    - RAGPIPES_MQTT__HANDLER=chat
+    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chat/alpha/command
+    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chat/alpha/response
+    - RAGPIPES_PGVECTOR__COLLECTION=alpha
 
   handler-chat-beta:
     build:
@@ -88,7 +88,7 @@ services:
     env_file:
       - .env
     environment:
-    - RAGPIPE_MQTT__HANDLER=chat
-    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chat/beta/command
-    - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chat/beta/response
-    - RAGPIPE_PGVECTOR__COLLECTION=beta
+    - RAGPIPES_MQTT__HANDLER=chat
+    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chat/beta/command
+    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chat/beta/response
+    - RAGPIPES_PGVECTOR__COLLECTION=beta

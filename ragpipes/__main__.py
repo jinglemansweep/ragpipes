@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import paho.mqtt.client as mqtt
 from dynaconf import Dynaconf
 from .config import VALIDATORS
@@ -11,11 +10,9 @@ from .handlers.loader_web import loader_web_handler
 from .handlers.loader_wikipedia import loader_wikipedia_handler
 from .utils import setup_logger
 
-if "LANGCHAIN_TRACING_V2" in os.environ:
-    del os.environ["LANGCHAIN_TRACING_V2"]
 
 settings = Dynaconf(
-    envvar_prefix="RAGPIPE",
+    envvar_prefix="RAGPIPES",
     settings_files=["settings.yml", "secrets.yml"],
     validators=VALIDATORS,
     merge_enabled=True,
@@ -47,6 +44,15 @@ def on_connect(client, userdata, flags, reason_code, properties):
     client.subscribe(f"{settings.mqtt.topic_command}")
 
 
+HANDLERS = {
+    "chunker": chunker_handler,
+    "loader.web": loader_web_handler,
+    "loader.wikipedia": loader_wikipedia_handler,
+    "vectorstore": vectorstore_handler,
+    "chat": chat_handler,
+}
+
+
 @mqttc.message_callback()
 def on_message(client, userdata, msg):
     try:
@@ -54,24 +60,13 @@ def on_message(client, userdata, msg):
     except json.JSONDecodeError:
         print(f"Invalid JSON payload: {payload}")
         return
+
     response = None
 
     try:
-        if settings.mqtt.handler == "chunker":
-            response = chunker_handler(payload, settings)
 
-        elif settings.mqtt.handler == "loader.web":
-            response = loader_web_handler(payload, settings)
-
-        elif settings.mqtt.handler == "loader.wikipedia":
-            response = loader_wikipedia_handler(payload, settings)
-
-        elif settings.mqtt.handler == "vectorstore":
-            response = vectorstore_handler(payload, settings)
-
-        elif settings.mqtt.handler == "chat":
-            response = chat_handler(payload, settings)
-
+        if settings.mqtt.handler in HANDLERS:
+            response = HANDLERS[settings.mqtt.handler](payload, settings)
         else:
             logger.error(f"Unknown handler: {settings.mqtt.handler}")
             return
