@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m venv ./.venv
-          . ./venv/bin/activate
+          . ./.venv/bin/activate
           pip instal flake8
       - name: flake8 check
         run: |
