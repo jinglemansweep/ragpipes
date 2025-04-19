@@ -25,5 +25,5 @@ jobs:
           pip install black
       - name: black check
         run: |
-          . ./venv/bin/activate
+          . ./.venv/bin/activate
           black ragpipes/
