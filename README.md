@@ -45,6 +45,8 @@ For example:
 
 Docker Compose Example:
 
+Create a `.env` file using the provided example [`.env.example`](./.env.example) file and set the required environment variables, and then create a Docker Compose file as follows:
+
     services:
 
       loader-web:
