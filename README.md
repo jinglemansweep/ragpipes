@@ -34,7 +34,13 @@ You can inspect what is happening by subscribing to the root MQTT topic:
 
 ### MQTT Examples
 
-    mosquitto_pub -h localhost -t "<TOPIC>" -m "<JSON>"
+    mosquitto_pub -h localhost -t "<TOPIC>" -m '{"data": <COMMAND>, "metadata": <METADATA>}'
+
+For example:
+
+    mosquitto_pub -h localhost \
+      -t "ragpipes/loaders/web/command" \
+      -m '{"data":{"url":"https://www.example.com"},"metadata":{"author":"John Doe"}}'
 
 #### Loader: Web (`ragpipes/loaders/web/command`)
 
