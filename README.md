@@ -30,10 +30,10 @@ The pipelines are defined in the `docker-compose.yml` file. Each pipeline node i
 
 For example:
 
-- The **web loader** node can listen to the `ragpipes/loaders/web/command` topic and publish to the `ragpipes/chunker/default/command` topic.
-- The **chunker** node can listen to the `ragpipes/chunker/default/command` topic and publish to the `ragpipes/chunker/default/response` topic.
-- The **vector store** node can listen to the `ragpipes/chunker/default/response` topic, and after persisting the chunked response in the underlying vector store engine, it publishes the status to the `ragpipes/vectorstore/default/response` topic.
-- The **chat** node can listen to the `ragpipes/chat/default/command` topic and publish to the `ragpipes/chat/default/response` topic. Each chat node must be configured with the vector store configuration it should use to retrieve the documents.
+- The **web loader** node can listen to the `ragpipes/loaders/web/command` topic. Once a message is received, it will load the web page, chunk it, and publish the page content to the `ragpipes/loaders/web/response` topic.
+- The **chunker** node can listen to the `ragpipes/chunker/default/command` topic. Once a message is received, it will chunk the content according to its configuration and publish to the `ragpipes/chunker/default/response` topic.
+- The **vector store** node can listen to the `ragpipes/chunker/default/response` topic. On receiving a message, it will persist the chunked response in the underlying vector store engine and then publishes the status to the `ragpipes/vectorstore/default/response` topic.
+- The **chat** node can listen to the `ragpipes/chat/default/command` topic. When a message is received, it will retrieve the documents from the vector store, generate a response, and then publish the response to the `ragpipes/chat/default/response` topic. Each chat node must be configured with the vector store configuration it should use to retrieve the documents.
 
 Docker Compose Example:
 
