@@ -1,39 +1,36 @@
+from __future__ import annotations
+
 import logging
+from typing import Optional
+
 from dynaconf import Dynaconf
 from langchain_community.document_loaders import WebBaseLoader
 from pydantic import field_validator
-from .utils import MessageBody, validate_payload, clean_text_body
-from typing import Optional
+
+from .utils import clean_text_body
+from .utils import MessageBody
+from .utils import validate_options
+from .utils import validate_payload
 
 logger = logging.getLogger(__name__)
 
 
 class InputModel(MessageBody):
-    @field_validator("data", mode="before")
+    @field_validator("options", mode="before")
     @classmethod
     def validate_keys(cls, v):
-        if "url" not in v:
-            raise ValueError("Keys 'url' must be present")
-        return v
+        return validate_options(v, ["url"])
 
 
-class OutputModel(MessageBody):
-    @field_validator("data", mode="before")
-    @classmethod
-    def validate_keys(cls, v):
-        if "docs" not in v:
-            raise ValueError("Keys 'docs' must be present")
-        return v
-
-
-def loader_web_handler(
+def handler(
     _payload: MessageBody, settings: Dynaconf
 ) -> Optional[MessageBody]:
+
     payload = validate_payload(InputModel, _payload)
     if not payload:
         return None
 
-    url = payload.data["url"]
+    url = payload.options.get("url")
 
     logger.info(f"loader.web.handler: url='{url}' metadata={payload.metadata}")
 
@@ -43,13 +40,11 @@ def loader_web_handler(
         docs = loader.load()
 
         for doc in docs:
-            # doc.id = str(uuid.uuid4())
             doc.page_content = clean_text_body(doc.page_content)
             doc.metadata = doc.metadata | payload.metadata
 
-        data = dict(docs=docs)
         logger.info(f"loader.web.response: docs_count={len(docs)}")
-        return OutputModel(data=data, metadata=payload.metadata)
+        return MessageBody(docs=docs, metadata=payload.metadata)
 
     except Exception as e:
         logger.error(f"loader.web.handler: error={e}")

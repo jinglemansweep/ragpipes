@@ -1,16 +1,31 @@
+from __future__ import annotations
+
 import logging
 import re
+from typing import Any
+from typing import Dict
+
+from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
 from langchain_postgres import PGVector
-from pydantic import BaseModel, ValidationError
-from typing import Any, Dict, Optional
+from pydantic import BaseModel
+from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
 
 
 class MessageBody(BaseModel):
-    data: Dict[str, Any] = {}
-    metadata: Optional[Dict[str, Any]] = {}
+    docs: list[Document] = []
+    options: Dict[str, Any] = {}
+    outputs: Dict[str, Any] = {}
+    metadata: Dict[str, Any] = {}
+
+
+def validate_options(options: Dict[str, Any], required_keys: list[str]):
+    for key in required_keys:
+        if key not in options:
+            raise ValueError(f"Key '{key}' must be present in options")
+    return options
 
 
 def validate_payload(model, payload):

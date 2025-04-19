@@ -2,17 +2,21 @@ from __future__ import annotations
 
 import json
 import logging
+import traceback
 
 import paho.mqtt.client as mqtt
 from dynaconf import Dynaconf
 
 from .config import VALIDATORS
-from .handlers.chat import chat_handler
-from .handlers.chunker import chunker_handler
-from .handlers.loader_text import loader_text_handler
-from .handlers.loader_web import loader_web_handler
-from .handlers.loader_wikipedia import loader_wikipedia_handler
-from .handlers.vectorstore import vectorstore_handler
+from .handlers.chat import handler as chat_handler
+from .handlers.chunker import handler as chunker_handler
+from .handlers.loader_text import handler as loader_text_handler
+from .handlers.loader_web import handler as loader_web_handler
+from .handlers.loader_wikipedia import handler as loader_wikipedia_handler
+from .handlers.translate_llmtranslate import (
+    handler as translate_llmtranslate_handler,
+)
+from .handlers.vectorstore import handler as vectorstore_handler
 from .utils import setup_logger
 
 
@@ -50,6 +54,7 @@ HANDLERS = {
     "loader.text": loader_text_handler,
     "loader.web": loader_web_handler,
     "loader.wikipedia": loader_wikipedia_handler,
+    "translate.llmtranslate": translate_llmtranslate_handler,
     "vectorstore": vectorstore_handler,
     "chat": chat_handler,
 }
@@ -81,6 +86,7 @@ def on_message(client, userdata, msg):
 
     except Exception as e:
         logger.error(f"Error processing message: {e}")
+        logger.error(traceback.format_exc())
 
 
 mqttc.connect(

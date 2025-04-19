@@ -1,36 +1,31 @@
+from __future__ import annotations
+
 import logging
+from typing import List
+from typing import Optional
+
 from dynaconf import Dynaconf
 from langchain import hub
 from langchain.chat_models import init_chat_model
 from langchain_core.documents import Document
-from langgraph.graph import START, StateGraph
+from langgraph.graph import START
+from langgraph.graph import StateGraph
 from pydantic import field_validator
-from .utils import MessageBody, setup_vectorstore, validate_payload
-
-from typing import List, Optional
 from typing_extensions import TypedDict
+
+from .utils import MessageBody
+from .utils import setup_vectorstore
+from .utils import validate_options
+from .utils import validate_payload
 
 logger = logging.getLogger(__name__)
 
 
 class InputModel(MessageBody):
-    @field_validator("data", mode="before")
+    @field_validator("options", mode="before")
     @classmethod
     def validate_keys(cls, v):
-        if "query" not in v:
-            raise ValueError("Keys 'query' must be present")
-        return v
-
-
-class OutputModel(MessageBody):
-    @field_validator("data", mode="before")
-    @classmethod
-    def validate_keys(cls, v):
-        if "answer" not in v:
-            raise ValueError("Keys 'answer' must be present")
-        if "context" not in v:
-            raise ValueError("Keys 'context' must be present")
-        return v
+        return validate_options(v, ["query"])
 
 
 class State(TypedDict):
@@ -39,15 +34,18 @@ class State(TypedDict):
     answer: str
 
 
-def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageBody]:
+def handler(
+    _payload: MessageBody, settings: Dynaconf
+) -> Optional[MessageBody]:
+
     payload = validate_payload(InputModel, _payload)
     if not payload:
         return None
-    print(payload)
-    query = payload.data["query"]
-    logger.info(f"chat.handler: query='{query}' metadata={payload.metadata}")
 
+    query = payload.options.get("query")
     db_uri = f"postgresql+psycopg://{settings.pgvector.user}:{settings.pgvector.password}@{settings.pgvector.host}:{settings.pgvector.port}/{settings.pgvector.database}"
+
+    logger.info(f"chat.handler: query='{query}' metadata={payload.metadata}")
 
     vector_store = setup_vectorstore(
         settings.openai.embedding_model, db_uri, settings.pgvector.collection
@@ -65,7 +63,9 @@ def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageB
 
     # Define document generation stage
     def generate(state: State):
-        docs_content = "\n\n".join(doc.page_content for doc in state["context"])
+        docs_content = "\n\n".join(
+            doc.page_content for doc in state["context"]
+        )
         messages = prompt.invoke(
             {"question": state["question"], "context": docs_content}
         )
@@ -79,12 +79,16 @@ def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageB
 
     # Invoke graph with question
     response = graph.invoke({"question": query})
-
     answer = response["answer"]
+
+    # Build context extract
     context = [
         dict(id=doc.id, content=doc.page_content, metadata=doc.metadata)
         for doc in response["context"][:2]
     ]
-    data = dict(answer=answer, context=context)
-    logger.info(f"chat.response: answer='{answer}' context_count={len(context)}")
-    return OutputModel(data=data, metadata=payload.metadata)
+
+    outputs = dict(answer=answer, context=context)
+    logger.info(
+        f"chat.response: answer='{answer}' context_count={len(context)}"
+    )
+    return MessageBody(outputs=outputs, metadata=payload.metadata)

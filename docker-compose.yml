@@ -38,7 +38,7 @@ services:
     environment:
      - RAGPIPES_MQTT__HANDLER=loader.text
      - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/text/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/command
 
   loader-web:
     build:
@@ -53,7 +53,7 @@ services:
     environment:
      - RAGPIPES_MQTT__HANDLER=loader.web
      - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/web/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/command
 
   loader-wikipedia:
     build:
@@ -68,9 +68,41 @@ services:
     environment:
      - RAGPIPES_MQTT__HANDLER=loader.wikipedia
      - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/wikipedia/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/command
 
-  chunker-alpha:
+  translate-llmtranslate-de:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+    networks:
+      - ragpipes
+    env_file:
+      - .env
+    environment:
+     - RAGPIPES_MQTT__HANDLER=translate.llmtranslate
+     - RAGPIPES_TRANSLATE__LANGUAGE=de
+     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/translate/de/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/translate/de/response
+
+  translate-llmtranslate-fr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+    networks:
+      - ragpipes
+    env_file:
+      - .env
+    environment:
+     - RAGPIPES_MQTT__HANDLER=translate.llmtranslate
+     - RAGPIPES_TRANSLATE__LANGUAGE=fr
+     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/translate/fr/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/translate/fr/response
+
+  chunker-default:
     build:
       context: .
       dockerfile: Dockerfile
@@ -82,27 +114,12 @@ services:
       - .env
     environment:
      - RAGPIPES_MQTT__HANDLER=chunker
-     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/alpha/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/response
+     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/default/command
+     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/response
      - RAGPIPES_CHUNKER__CHUNK_SIZE=300
      - RAGPIPES_CHUNKER__CHUNK_OVERLAP=30
 
-  chunker-beta:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - mosquitto
-    networks:
-      - ragpipes
-    env_file:
-      - .env
-    environment:
-     - RAGPIPES_MQTT__HANDLER=chunker
-     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/beta/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/beta/response
-
-  vectorstore-alpha:
+  vectorstore-default:
     build:
       context: .
       dockerfile: Dockerfile
@@ -114,27 +131,11 @@ services:
       - .env
     environment:
     - RAGPIPES_MQTT__HANDLER=vectorstore
-    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/alpha/response
-    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/vectorstore/alpha/response
-    - RAGPIPES_PGVECTOR__COLLECTION=alpha
+    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/default/response
+    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/vectorstore/default/response
+    - RAGPIPES_PGVECTOR__COLLECTION=default
 
-  vectorstore-beta:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - mosquitto
-    networks:
-      - ragpipes
-    env_file:
-      - .env
-    environment:
-    - RAGPIPES_MQTT__HANDLER=vectorstore
-    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/beta/response
-    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/vectorstore/beta/response
-    - RAGPIPES_PGVECTOR__COLLECTION=beta
-
-  chat-alpha:
+  chat-default:
     build:
       context: .
       dockerfile: Dockerfile
@@ -147,26 +148,9 @@ services:
       - .env
     environment:
     - RAGPIPES_MQTT__HANDLER=chat
-    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chat/alpha/command
-    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chat/alpha/response
-    - RAGPIPES_PGVECTOR__COLLECTION=alpha
-
-  chat-beta:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - mosquitto
-      - pgvector
-    networks:
-      - ragpipes
-    env_file:
-      - .env
-    environment:
-    - RAGPIPES_MQTT__HANDLER=chat
-    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chat/beta/command
-    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chat/beta/response
-    - RAGPIPES_PGVECTOR__COLLECTION=beta
+    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chat/default/command
+    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chat/default/response
+    - RAGPIPES_PGVECTOR__COLLECTION=default
 
 volumes:
   mosquitto_data:

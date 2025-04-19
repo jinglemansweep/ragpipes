@@ -8,30 +8,20 @@ from langchain_core.documents import Document
 from pydantic import field_validator
 
 from .utils import MessageBody
+from .utils import validate_options
 from .utils import validate_payload
 
 logger = logging.getLogger(__name__)
 
 
 class InputModel(MessageBody):
-    @field_validator("data", mode="before")
+    @field_validator("options", mode="before")
     @classmethod
     def validate_keys(cls, v):
-        if "text" not in v:
-            raise ValueError("Keys 'text' must be present")
-        return v
+        return validate_options(v, ["text"])
 
 
-class OutputModel(MessageBody):
-    @field_validator("data", mode="before")
-    @classmethod
-    def validate_keys(cls, v):
-        if "docs" not in v:
-            raise ValueError("Keys 'docs' must be present")
-        return v
-
-
-def loader_text_handler(
+def handler(
     _payload: MessageBody, settings: Dynaconf
 ) -> Optional[MessageBody]:
 
@@ -39,7 +29,7 @@ def loader_text_handler(
     if not payload:
         return None
 
-    text = payload.data["text"]
+    text = payload.options.get("text")
 
     logger.info(
         f"loader.text.handler: text='{text}' metadata={payload.metadata}"
@@ -48,9 +38,8 @@ def loader_text_handler(
     try:
 
         doc = Document(page_content=text, metadata=payload.metadata)
-        data = dict(docs=[doc])
-        logger.info(f"loader.text.response: docs_count={len(data['docs'])}")
-        return OutputModel(data=data, metadata=payload.metadata)
+        logger.info(f"loader.text.response: text={text}")
+        return MessageBody(docs=[doc], metadata=payload.metadata)
 
     except Exception as e:
         logger.error(f"loader.web.handler: error={e}")

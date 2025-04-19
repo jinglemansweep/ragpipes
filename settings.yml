@@ -20,8 +20,13 @@ pgvector:
   # collection: ragpipe
 
 openai:
+  # chat_model: gpt-4o-mini
   # embedding_model: text-embedding-ada-002
+  # translate_model: gpt-4o-mini
 
 chunker:
   # chunk_size: 200
   # chunk_overlap: 20
+
+translate:
+  # language: en

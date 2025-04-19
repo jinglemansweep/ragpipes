@@ -1,43 +1,31 @@
+from __future__ import annotations
+
 import logging
 import re
+from typing import Optional
+
 from dynaconf import Dynaconf
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pydantic import field_validator
-from .utils import MessageBody, validate_payload
-from typing import Optional
+
+from .utils import MessageBody
+from .utils import validate_payload
 
 logger = logging.getLogger(__name__)
 
 
-class InputModel(MessageBody):
-    @field_validator("data", mode="before")
-    @classmethod
-    def validate_keys(cls, v):
-        if "docs" not in v:
-            raise ValueError("Keys 'docs' must be present")
-        return v
+def handler(
+    _payload: MessageBody, settings: Dynaconf
+) -> Optional[MessageBody]:
 
-
-class OutputModel(MessageBody):
-    @field_validator("data", mode="before")
-    @classmethod
-    def validate_keys(cls, v):
-        if "docs" not in v:
-            raise ValueError("Keys 'docs' must be present")
-        return v
-
-
-def chunker_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageBody]:
-    payload = validate_payload(InputModel, _payload)
+    payload = validate_payload(MessageBody, _payload)
     if not payload:
         return None
 
-    docs = payload.data["docs"]
-    output_docs = []
+    docs = []
 
     logger.info(
-        f"chunker.handler: docs_count={len(docs)} chunk_size={settings.chunker.chunk_size} chunk_overlap={settings.chunker.chunk_overlap} metadata={payload.metadata}"
+        f"chunker.handler: docs_count={len(payload.docs)} chunk_size={settings.chunker.chunk_size} chunk_overlap={settings.chunker.chunk_overlap} metadata={payload.metadata}"
     )
 
     chunker = RecursiveCharacterTextSplitter(
@@ -45,14 +33,13 @@ def chunker_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[Messa
         chunk_overlap=settings.chunker.chunk_overlap,
     )
 
-    for doc in docs:
+    for doc in payload.docs:
 
-        input_text = re.sub(r"(\n\s*)+\n", "\n\n", doc["page_content"])
+        input_text = re.sub(r"(\n\s*)+\n", "\n\n", doc.page_content)
         chunks = chunker.split_text(input_text)
 
         for chunk in chunks:
-            output_docs.append(Document(chunk, id=doc["id"], metadata=doc["metadata"]))
+            docs.append(Document(chunk, id=doc.id, metadata=doc.metadata))
 
-    data = dict(docs=output_docs)
-    logger.info(f"chunker.response: docs_count={len(output_docs)}")
-    return OutputModel(data=data, metadata=payload.metadata)
+    logger.info(f"chunker.response: docs_count={len(docs)}")
+    return MessageBody(docs=docs, metadata=payload.metadata)
