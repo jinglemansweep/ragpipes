@@ -19,6 +19,7 @@ from .handlers.translate_llmtranslate import (
 from .handlers.vectorstore import handler as vectorstore_handler
 from .utils import setup_logger
 
+TOPIC_DELIMITER = ","
 
 settings = Dynaconf(
     envvar_prefix="RAGPIPES",
@@ -43,10 +44,15 @@ if settings.mqtt.username is not None and settings.mqtt.password is not None:
 @mqttc.connect_callback()
 def on_connect(client, userdata, flags, reason_code, properties):
     connected = reason_code == 0
+    topics_in = settings.mqtt.topic_in.split(TOPIC_DELIMITER)
+    topics_out = settings.mqtt.topic_out.split(TOPIC_DELIMITER)
+
     logger.info(
-        f"MQTT connected={connected} handler={settings.mqtt.handler} command_topic={settings.mqtt.topic_command} response_topic={settings.mqtt.topic_response}"
+        f"MQTT connected={connected} handler={settings.mqtt.handler} topics_in={len(topics_in)} topics_out={len(topics_out)}"
     )
-    client.subscribe(f"{settings.mqtt.topic_command}")
+
+    for topic in topics_in:
+        client.subscribe(topic)
 
 
 HANDLERS = {
@@ -80,9 +86,9 @@ def on_message(client, userdata, msg):
 
         if response:
             logger.debug(f"response: {response}")
-            mqttc.publish(
-                f"{settings.mqtt.topic_response}", response.model_dump_json()
-            )
+            topics = settings.mqtt.topic_out.split(TOPIC_DELIMITER)
+            for topic in topics:
+                mqttc.publish(topic, response.model_dump_json())
 
     except Exception as e:
         logger.error(f"Error processing message: {e}")

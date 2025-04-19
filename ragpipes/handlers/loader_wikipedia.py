@@ -38,7 +38,6 @@ def handler(
     docs = WikipediaLoader(query=query, load_max_docs=3).load()
 
     for doc in docs:
-        # doc.id = str(uuid.uuid4())
         doc.metadata = doc.metadata | payload.metadata
 
     logger.info(f"loader.wikipedia.response: docs_count={len(docs)}")

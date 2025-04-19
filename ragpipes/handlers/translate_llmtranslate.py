@@ -22,26 +22,25 @@ def handler(
     if not payload:
         return None
 
-    docs = payload.options.get("docs")
-    output_docs = []
+    docs = []
 
     logger.info(
-        f"translate.llmtranslate.handler: docs_count={len(docs)} language={settings.translate.language} metadata={payload.metadata}"
+        f"translate.llmtranslate.handler: docs_count={len(payload.docs)} language={settings.translate.language} metadata={payload.metadata}"
     )
 
     llm = ChatOpenAI(model=settings.openai.translate_model)
     translator = Translator(llm=llm)
 
-    for doc in docs:
-        text_language = translator.get_text_language(doc["page_content"])
+    for doc in payload.docs:
+        text_language = translator.get_text_language(doc.page_content)
         if text_language:
-            output_docs.append(
+            docs.append(
                 Document(
                     page_content=translator.translate(
-                        doc["page_content"], settings.translate.language
+                        doc.page_content, settings.translate.language
                     ),
                     metadata=(
-                        doc.get("metadata", {})
+                        doc.metadata
                         | payload.metadata
                         | {"language": settings.translate.language}
                     ),

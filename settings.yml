@@ -8,8 +8,8 @@ mqtt:
   # password: password
   # keepalive: 60
   # handler: text
-  # topic_command: ragpipe/command
-  # topic_response: ragpipe/response
+  # topic_in: ragpipe/node/in
+  # topic_out: ragpipe/node/out
 
 pgvector:
   # host: localhost

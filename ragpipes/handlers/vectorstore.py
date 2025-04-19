@@ -41,7 +41,9 @@ def handler(
     )
 
     return MessageBody(
-        docs=payload.docs,
-        outputs=dict(collection=settings.pgvector.collection),
+        docs=[],
+        outputs=dict(
+            added=len(payload.docs), collection=settings.pgvector.collection
+        ),
         metadata=payload.metadata,
     )

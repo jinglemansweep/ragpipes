@@ -37,8 +37,8 @@ services:
       - .env
     environment:
      - RAGPIPES_MQTT__HANDLER=loader.text
-     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/text/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/command
+     - RAGPIPES_MQTT__TOPIC_IN=ragpipes/loader/text/command
+     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command,ragpipes/translate/de/command
 
   loader-web:
     build:
@@ -52,8 +52,8 @@ services:
       - .env
     environment:
      - RAGPIPES_MQTT__HANDLER=loader.web
-     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/web/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/command
+     - RAGPIPES_MQTT__TOPIC_IN=ragpipes/loader/web/command
+     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command,ragpipes/translate/de/command
 
   loader-wikipedia:
     build:
@@ -67,10 +67,10 @@ services:
       - .env
     environment:
      - RAGPIPES_MQTT__HANDLER=loader.wikipedia
-     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/wikipedia/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/command
+     - RAGPIPES_MQTT__TOPIC_IN=ragpipes/loader/wikipedia/command
+     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command,ragpipes/translate/de/command
 
-  translate-llmtranslate-de:
+  translate-de:
     build:
       context: .
       dockerfile: Dockerfile
@@ -83,24 +83,8 @@ services:
     environment:
      - RAGPIPES_MQTT__HANDLER=translate.llmtranslate
      - RAGPIPES_TRANSLATE__LANGUAGE=de
-     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/translate/de/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/translate/de/response
-
-  translate-llmtranslate-fr:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - mosquitto
-    networks:
-      - ragpipes
-    env_file:
-      - .env
-    environment:
-     - RAGPIPES_MQTT__HANDLER=translate.llmtranslate
-     - RAGPIPES_TRANSLATE__LANGUAGE=fr
-     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/translate/fr/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/translate/fr/response
+     - RAGPIPES_MQTT__TOPIC_IN=ragpipes/translate/de/command
+     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command
 
   chunker-default:
     build:
@@ -114,8 +98,8 @@ services:
       - .env
     environment:
      - RAGPIPES_MQTT__HANDLER=chunker
-     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/default/command
-     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/response
+     - RAGPIPES_MQTT__TOPIC_IN=ragpipes/chunker/default/command
+     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/response
      - RAGPIPES_CHUNKER__CHUNK_SIZE=300
      - RAGPIPES_CHUNKER__CHUNK_OVERLAP=30
 
@@ -131,8 +115,8 @@ services:
       - .env
     environment:
     - RAGPIPES_MQTT__HANDLER=vectorstore
-    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/default/response
-    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/vectorstore/default/response
+    - RAGPIPES_MQTT__TOPIC_IN=ragpipes/chunker/default/response
+    - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/vectorstore/default/response
     - RAGPIPES_PGVECTOR__COLLECTION=default
 
   chat-default:
@@ -148,8 +132,8 @@ services:
       - .env
     environment:
     - RAGPIPES_MQTT__HANDLER=chat
-    - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chat/default/command
-    - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chat/default/response
+    - RAGPIPES_MQTT__TOPIC_IN=ragpipes/chat/default/command
+    - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chat/default/response
     - RAGPIPES_PGVECTOR__COLLECTION=default
 
 volumes:

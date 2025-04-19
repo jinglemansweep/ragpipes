@@ -15,8 +15,8 @@ VALIDATORS = [
     Validator("mqtt.keepalive", default=60, cast=int),
     Validator("mqtt.username", default=None),
     Validator("mqtt.password", default=None),
-    Validator("mqtt.topic_command", default=None),
-    Validator("mqtt.topic_response", default=None),
+    Validator("mqtt.topic_in", default=None),
+    Validator("mqtt.topic_out", default=None),
     Validator("mqtt.handler", default=None),
     # PGVECTOR
     Validator("pgvector.host", default="localhost"),
