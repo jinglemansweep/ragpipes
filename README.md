@@ -1,5 +1,8 @@
 # RAGPipes
 
+[![docker](https://github.com/jinglemansweep/ragpipes/actions/workflows/docker.yml/badge.svg)](https://github.com/jinglemansweep/ragpipes/actions/workflows/docker.yml)
+[![mypy](https://github.com/jinglemansweep/ragpipes/actions/workflows/mypy.yml/badge.svg)](https://github.com/jinglemansweep/ragpipes/actions/workflows/mypy.yml) [![flake8](https://github.com/jinglemansweep/ragpipes/actions/workflows/flake8.yml/badge.svg)](https://github.com/jinglemansweep/ragpipes/actions/workflows/flake8.yml) [![black](https://github.com/jinglemansweep/ragpipes/actions/workflows/black.yml/badge.svg)](https://github.com/jinglemansweep/ragpipes/actions/workflows/black.yml) [![codeql](https://github.com/jinglemansweep/ragpipes/actions/workflows/codeql.yml/badge.svg)](https://github.com/jinglemansweep/ragpipes/actions/workflows/codeql.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 RAGPipes is a container based MQTT driven RAG (Retrieval-Augmented Generation) pipeline framework. Consisting of several primitive node types (e.g. `Loader`, `Chunker`, `VectorStore`) each run as an individual container with its own configuration, provided using environment variables. The nodes are connected using MQTT topics, also specified using environment variables.
 
 ## Features
