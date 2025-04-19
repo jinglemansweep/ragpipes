@@ -9,7 +9,7 @@ services:
     environment:
      - RAGPIPE_MQTT__HANDLER=loader.web
      - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/loader/web/command
-     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunk/alpha/command
+     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunker/alpha/command
   handler-loader-wikipedia:
     build:
       context: .
@@ -19,31 +19,31 @@ services:
     environment:
      - RAGPIPE_MQTT__HANDLER=loader.wikipedia
      - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/loader/wikipedia/command
-     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunk/alpha/command
+     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunker/alpha/command
 
-  handler-chunk-alpha:
+  handler-chunker-alpha:
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
       - .env
     environment:
-     - RAGPIPE_MQTT__HANDLER=chunk
-     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunk/alpha/command
-     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunk/alpha/response
+     - RAGPIPE_MQTT__HANDLER=chunker
+     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunker/alpha/command
+     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunker/alpha/response
      - RAGPIPE_CHUNKER__CHUNK_SIZE=300
      - RAGPIPE_CHUNKER__CHUNK_OVERLAP=30
 
-  handler-chunk-beta:
+  handler-chunker-beta:
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
       - .env
     environment:
-     - RAGPIPE_MQTT__HANDLER=chunk
-     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunk/beta/command
-     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunk/beta/response
+     - RAGPIPE_MQTT__HANDLER=chunker
+     - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunker/beta/command
+     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/chunker/beta/response
 
   handler-vectorstore-alpha:
     build:
@@ -53,7 +53,7 @@ services:
       - .env
     environment:
     - RAGPIPE_MQTT__HANDLER=vectorstore
-    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunk/alpha/response
+    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunker/alpha/response
     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/vectorstore/alpha/response
     - RAGPIPE_PGVECTOR__COLLECTION=alpha
 
@@ -65,7 +65,7 @@ services:
       - .env
     environment:
     - RAGPIPE_MQTT__HANDLER=vectorstore
-    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunk/beta/response
+    - RAGPIPE_MQTT__TOPIC_COMMAND=ragpipe/chunker/beta/response
     - RAGPIPE_MQTT__TOPIC_RESPONSE=ragpipe/vectorstore/beta/response
     - RAGPIPE_PGVECTOR__COLLECTION=beta
 

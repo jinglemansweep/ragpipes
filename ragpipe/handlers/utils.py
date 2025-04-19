@@ -3,14 +3,14 @@ import re
 from langchain_openai import OpenAIEmbeddings
 from langchain_postgres import PGVector
 from pydantic import BaseModel, ValidationError
-from typing import Any
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class MessageBody(BaseModel):
-    data: Any
-    metadata: dict = {}
+    data: Dict[str, Any] = {}
+    metadata: Optional[Dict[str, Any]] = {}
 
 
 def validate_payload(model, payload):

@@ -1,14 +1,18 @@
 import json
 import logging
+import os
 import paho.mqtt.client as mqtt
 from dynaconf import Dynaconf
 from .config import VALIDATORS
 from .handlers.chat import chat_handler
-from .handlers.chunk import chunk_handler
+from .handlers.chunker import chunker_handler
 from .handlers.vectorstore import vectorstore_handler
 from .handlers.loader_web import loader_web_handler
 from .handlers.loader_wikipedia import loader_wikipedia_handler
 from .utils import setup_logger
+
+if "LANGCHAIN_TRACING_V2" in os.environ:
+    del os.environ["LANGCHAIN_TRACING_V2"]
 
 settings = Dynaconf(
     envvar_prefix="RAGPIPE",
@@ -17,6 +21,7 @@ settings = Dynaconf(
     merge_enabled=True,
     load_dotenv=True,
 )
+
 
 setup_logger(settings.general.log_level)
 
@@ -51,28 +56,32 @@ def on_message(client, userdata, msg):
         return
     response = None
 
-    if settings.mqtt.handler == "chunk":
-        response = chunk_handler(payload, settings)
+    try:
+        if settings.mqtt.handler == "chunker":
+            response = chunker_handler(payload, settings)
 
-    elif settings.mqtt.handler == "loader.web":
-        response = loader_web_handler(payload, settings)
+        elif settings.mqtt.handler == "loader.web":
+            response = loader_web_handler(payload, settings)
 
-    elif settings.mqtt.handler == "loader.wikipedia":
-        response = loader_wikipedia_handler(payload, settings)
+        elif settings.mqtt.handler == "loader.wikipedia":
+            response = loader_wikipedia_handler(payload, settings)
 
-    elif settings.mqtt.handler == "vectorstore":
-        response = vectorstore_handler(payload, settings)
+        elif settings.mqtt.handler == "vectorstore":
+            response = vectorstore_handler(payload, settings)
 
-    elif settings.mqtt.handler == "chat":
-        response = chat_handler(payload, settings)
+        elif settings.mqtt.handler == "chat":
+            response = chat_handler(payload, settings)
 
-    else:
-        logger.error(f"Unknown handler: {settings.mqtt.handler}")
-        return
+        else:
+            logger.error(f"Unknown handler: {settings.mqtt.handler}")
+            return
 
-    if response:
-        logger.info(f"response: {response}")
-        mqttc.publish(f"{settings.mqtt.topic_response}", response.model_dump_json())
+        if response:
+            logger.debug(f"response: {response}")
+            mqttc.publish(f"{settings.mqtt.topic_response}", response.model_dump_json())
+
+    except Exception as e:
+        logger.error(f"Error processing message: {e}")
 
 
 mqttc.connect(

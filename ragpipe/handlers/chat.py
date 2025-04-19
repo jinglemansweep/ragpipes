@@ -4,6 +4,7 @@ from langchain import hub
 from langchain.chat_models import init_chat_model
 from langchain_core.documents import Document
 from langgraph.graph import START, StateGraph
+from pydantic import field_validator
 from .utils import MessageBody, setup_vectorstore, validate_payload
 
 from typing import List, Optional
@@ -13,7 +14,23 @@ logger = logging.getLogger(__name__)
 
 
 class InputModel(MessageBody):
-    pass
+    @field_validator("data", mode="before")
+    @classmethod
+    def validate_keys(cls, v):
+        if "query" not in v:
+            raise ValueError("Keys 'query' must be present")
+        return v
+
+
+class OutputModel(MessageBody):
+    @field_validator("data", mode="before")
+    @classmethod
+    def validate_keys(cls, v):
+        if "answer" not in v:
+            raise ValueError("Keys 'answer' must be present")
+        if "context" not in v:
+            raise ValueError("Keys 'context' must be present")
+        return v
 
 
 class State(TypedDict):
@@ -26,9 +43,12 @@ def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageB
     payload = validate_payload(InputModel, _payload)
     if not payload:
         return None
-    logger.info(f"chat.handler: payload={payload}")
+    print(payload)
+    query = payload.data["query"]
+    logger.info(f"chat.handler: query={query} metadata={payload.metadata}")
 
     db_uri = f"postgresql+psycopg://{settings.pgvector.user}:{settings.pgvector.password}@{settings.pgvector.host}:{settings.pgvector.port}/{settings.pgvector.database}"
+
     vector_store = setup_vectorstore(
         settings.openai.embedding_model, db_uri, settings.pgvector.collection
     )
@@ -58,13 +78,13 @@ def chat_handler(_payload: MessageBody, settings: Dynaconf) -> Optional[MessageB
     graph = graph_builder.compile()
 
     # Invoke graph with question
-    response = graph.invoke({"question": payload.data})
+    response = graph.invoke({"question": query})
 
     answer = response["answer"]
     context = [
         dict(id=doc.id, content=doc.page_content, metadata=doc.metadata)
-        for doc in response["context"][:1]
+        for doc in response["context"][:2]
     ]
-
-    logger.info(f"chat.data: answer={answer} context={context}")
-    return MessageBody(data=answer, metadata=payload.metadata | {"context": context})
+    data = dict(answer=answer, context=context)
+    logger.info(f"chat.response: answer={answer} context_count={len(context)}")
+    return OutputModel(data=data, metadata=payload.metadata)
