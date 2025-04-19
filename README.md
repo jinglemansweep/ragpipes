@@ -23,3 +23,60 @@ To get started with RAGPipes, check out the example provided [`docker-compose.ym
 You can inspect what is happening by subscribing to the root MQTT topic:
 
     mosquitto_sub -h localhost -t "ragpipes/#"
+
+### MQTT Examples
+
+    mosquitto_pub -h localhost -t "<TOPIC>" -m "<JSON>"
+
+#### Loader: Web (`ragpipes/loaders/web/command`)
+
+Command:
+
+    { "url": "https://www.example.com" }
+
+Response:
+
+    { "docs": [Document, ...] }
+
+#### Loader: Wikipedia (`ragpipes/loaders/wikipedia/command`)
+
+Command:
+
+    { "query": "World Cup" }
+
+Response:
+
+    { "docs": [Document, ...] }
+
+#### Chunker
+
+Command:
+
+    { "docs": [Document, ...] }
+
+Response:
+
+    { "docs": [Document, ...] }
+
+#### VectorStore: PGVector (`ragpipes/vectorstores/pgvector/command`)
+
+Command:
+
+    { "docs": [Document, ...] }
+
+Response:
+
+    { "added": 10, "collection": "default" }
+
+#### Chat (`ragpipes/chat/default/command`)
+
+Command:
+
+    { "query": "What is the capital of France?" }
+
+Response:
+
+    {
+      "answer": "The capital of France is Paris.",
+      "context": [Document, ...],
+    }
