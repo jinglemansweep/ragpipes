@@ -22,7 +22,7 @@ jobs:
         run: |
           python -m venv ./.venv
           . ./.venv/bin/activate
-          pip instal flake8
+          pip install flake8
       - name: flake8 check
         run: |
           . ./.venv/bin/activate
