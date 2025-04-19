@@ -25,5 +25,5 @@ jobs:
           pip instal flake8
       - name: flake8 check
         run: |
-          . ./venv/bin/activate
+          . ./.venv/bin/activate
           flake8 ragpipes/
