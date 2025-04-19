@@ -11,7 +11,6 @@ services:
     ports:
       - "1883:1883"
 
-
   pgvector:
     image: pgvector/pgvector:pg17
     networks:

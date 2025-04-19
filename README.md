@@ -42,6 +42,17 @@ Create a `.env` file using the provided example [`.env.example`](./.env.example)
 
     services:
 
+      loader-text:
+        build:
+          context: .
+          dockerfile: Dockerfile
+          env_file:
+            - .env
+        environment:
+         - RAGPIPES_MQTT__HANDLER=loader.text
+         - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/text/command
+         - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/default/command
+
       loader-web:
         build:
           context: .
