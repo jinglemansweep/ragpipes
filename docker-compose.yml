@@ -1,10 +1,38 @@
 services:
 
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    networks:
+     - ragpipes
+    volumes:
+      - ./resources/mosquitto/config:/mosquitto/config
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    ports:
+      - "1883:1883"
 
-  handler-loader-text:
+
+  pgvector:
+    image: pgvector/pgvector:pg17
+    networks:
+     - ragpipes
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pgvector
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  loader-text:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+    networks:
+      - ragpipes
     env_file:
       - .env
     environment:
@@ -12,10 +40,14 @@ services:
      - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/text/command
      - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
 
-  handler-loader-web:
+  loader-web:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+    networks:
+      - ragpipes
     env_file:
       - .env
     environment:
@@ -23,10 +55,14 @@ services:
      - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/web/command
      - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
 
-  handler-loader-wikipedia:
+  loader-wikipedia:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+     - mosquitto
+    networks:
+      - ragpipes
     env_file:
       - .env
     environment:
@@ -34,10 +70,14 @@ services:
      - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/loader/wikipedia/command
      - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/alpha/command
 
-  handler-chunker-alpha:
+  chunker-alpha:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+    networks:
+      - ragpipes
     env_file:
       - .env
     environment:
@@ -47,10 +87,14 @@ services:
      - RAGPIPES_CHUNKER__CHUNK_SIZE=300
      - RAGPIPES_CHUNKER__CHUNK_OVERLAP=30
 
-  handler-chunker-beta:
+  chunker-beta:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+    networks:
+      - ragpipes
     env_file:
       - .env
     environment:
@@ -58,10 +102,14 @@ services:
      - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chunker/beta/command
      - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chunker/beta/response
 
-  handler-vectorstore-alpha:
+  vectorstore-alpha:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+    networks:
+      - ragpipes
     env_file:
       - .env
     environment:
@@ -70,10 +118,14 @@ services:
     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/vectorstore/alpha/response
     - RAGPIPES_PGVECTOR__COLLECTION=alpha
 
-  handler-vectorstore-beta:
+  vectorstore-beta:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+    networks:
+      - ragpipes
     env_file:
       - .env
     environment:
@@ -82,10 +134,15 @@ services:
     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/vectorstore/beta/response
     - RAGPIPES_PGVECTOR__COLLECTION=beta
 
-  handler-chat-alpha:
+  chat-alpha:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+      - pgvector
+    networks:
+      - ragpipes
     env_file:
       - .env
     environment:
@@ -94,10 +151,15 @@ services:
     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chat/alpha/response
     - RAGPIPES_PGVECTOR__COLLECTION=alpha
 
-  handler-chat-beta:
+  chat-beta:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - mosquitto
+      - pgvector
+    networks:
+      - ragpipes
     env_file:
       - .env
     environment:
@@ -105,3 +167,12 @@ services:
     - RAGPIPES_MQTT__TOPIC_COMMAND=ragpipes/chat/beta/command
     - RAGPIPES_MQTT__TOPIC_RESPONSE=ragpipes/chat/beta/response
     - RAGPIPES_PGVECTOR__COLLECTION=beta
+
+volumes:
+  mosquitto_data:
+  mosquitto_log:
+  pgvector_data:
+
+networks:
+  ragpipes:
+    driver: bridge

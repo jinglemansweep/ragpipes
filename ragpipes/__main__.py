@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 logger.debug(f"settings: {settings.to_dict()}")
 
 mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-if settings.mqtt.username and settings.mqtt.password:
+if settings.mqtt.username is not None and settings.mqtt.password is not None:
     mqttc.username_pw_set(settings.mqtt.username, settings.mqtt.password)
 
 
@@ -60,7 +60,7 @@ def on_message(client, userdata, msg):
     try:
         payload = json.loads(msg.payload.decode("utf-8"))
     except json.JSONDecodeError:
-        print(f"Invalid JSON payload: {payload}")
+        logger.error("Invalid JSON payload")
         return
 
     response = None
