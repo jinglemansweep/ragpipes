@@ -83,7 +83,7 @@ services:
     environment:
      - RAGPIPES_MQTT__HANDLER=loader.wikipedia
      - RAGPIPES_MQTT__TOPIC_IN=ragpipes/loader/wikipedia/command
-     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command,ragpipes/translate/de/command
+     - RAGPIPES_MQTT__TOPIC_OUT=ragpipes/chunker/default/command # ,ragpipes/translate/de/command
 
   translate-de:
     build:
