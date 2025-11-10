@@ -50,8 +50,8 @@ ragpipes = "ragpipes.main:main"
 ragpipes-cli = "ragpipes.cli.main:cli"
 
 [project.urls]
-Homepage = "https://github.com/your-org/ragpipes"
-Repository = "https://github.com/your-org/ragpipes"
+Homepage = "https://github.com/jinglemansweep/ragpipes"
+Repository = "https://github.com/jinglemansweep/ragpipes"
 Documentation = "https://ragpipes.readthedocs.io"
 
 [tool.setuptools.packages.find]
