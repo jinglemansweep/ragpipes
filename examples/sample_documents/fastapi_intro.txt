@@ -1,0 +1,14 @@
+FastAPI is a modern, fast (high-performance) web framework for building APIs with Python 3.6+ based on standard Python type hints. 
+It was created by Sebastián Ramírez and first released in 2018. FastAPI is built on top of Starlette for the web parts and Pydantic for the data parts.
+
+Key features of FastAPI include:
+- Fast: Very high performance, on par with NodeJS and Go (thanks to Starlette and Pydantic)
+- Fast to code: Increase the speed to develop features by about 200% to 300%
+- Fewer bugs: Reduce about 40% of human-induced bugs
+- Intuitive: Great editor support, completion everywhere, less time debugging
+- Easy: Designed to be easy to use and learn, less time reading docs
+- Short: Minimize code duplication, multiple features from each parameter declaration
+
+FastAPI uses Pydantic for data validation and serialization, which provides automatic data validation, serialization, and documentation generation. The framework automatically generates interactive API documentation (Swagger UI and ReDoc) from your code and type hints.
+
+The framework supports dependency injection, async/await syntax, WebSocket, background tasks, and has built-in support for testing. It's designed to be standards-compliant and fully compatible with OpenAPI specifications.
