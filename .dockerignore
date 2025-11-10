@@ -1,8 +1,0 @@
-.env
-.venv
-.mypy_cache
-Dockerfile
-docker-compose.yml
-settings.yml
-secrets.yml
-**/__pycache__

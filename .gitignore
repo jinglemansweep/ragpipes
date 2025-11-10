@@ -1,8 +1,0 @@
-.mypy_cache
-.venv
-__pycache__
-*.pyc
-*.pyo
-
-.env
-secrets.yml
