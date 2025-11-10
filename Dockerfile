@@ -19,11 +19,18 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Create Python virtual environment and upgrade pip
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --upgrade pip
+
+# Add venv to PATH
+ENV PATH="/opt/venv/bin:$PATH"
+
 # Copy requirements first for better caching
 COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
-# Install Python dependencies (this layer will be cached if pyproject.toml doesn't change)
+# Install Python dependencies in virtual environment (this layer will be cached if pyproject.toml doesn't change)
 RUN pip install --no-cache-dir -e .
 
 # Create non-root user
@@ -41,5 +48,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/api/v1/health || exit 1
 
-# Run the application
-CMD ["python", "-m", "uvicorn", "src.ragpipes.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application using virtual environment
+CMD ["/opt/venv/bin/python", "-m", "uvicorn", "src.ragpipes.main:app", "--host", "0.0.0.0", "--port", "8000"]
