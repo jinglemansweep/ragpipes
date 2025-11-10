@@ -73,11 +73,32 @@ class ChromaStore:
             metadata = {
                 k: v for k, v in doc.items() if k not in ["embedding", "content", "id"]
             }
-            metadatas.append(metadata)
 
-        # Add to ChromaDB
+            # If metadata is nested under "metadata" key, flatten it
+            if "metadata" in metadata and isinstance(metadata["metadata"], dict):
+                flattened_metadata = metadata["metadata"].copy()
+                # Add any other top-level metadata fields
+                for k, v in metadata.items():
+                    if k != "metadata":
+                        flattened_metadata[k] = v
+                metadatas.append(flattened_metadata)
+            else:
+                # ChromaDB doesn't accept empty metadata dicts, convert to None
+                if metadata == {}:
+                    metadatas.append(None)
+                else:
+                    metadatas.append(metadata)
+
+        # Add to ChromaDB - filter out None metadata values
+        filtered_metadatas = [m if m is not None else {} for m in metadatas]
+        # For completely empty metadata, we need to add a dummy field to satisfy ChromaDB
+        final_metadatas = [m if m else {"_empty": True} for m in filtered_metadatas]
+
         self.collection.add(
-            ids=ids, embeddings=embeddings, metadatas=metadatas, documents=contents
+            ids=ids,
+            embeddings=embeddings,
+            metadatas=final_metadatas,
+            documents=contents,
         )
 
         return ids
@@ -145,6 +166,32 @@ class ChromaStore:
             Number of documents
         """
         return self.collection.count()
+
+    async def list_documents(self, limit: int | None = None) -> list[dict[str, Any]]:
+        """List all documents in the collection.
+
+        Args:
+            limit: Maximum number of documents to return (None for all)
+
+        Returns:
+            List of document dictionaries
+        """
+        try:
+            # Get all documents from the collection
+            results = self.collection.get(limit=limit)
+
+            documents = []
+            for i in range(len(results["ids"])):
+                doc = {
+                    "id": results["ids"][i],
+                    "content": results["documents"][i] if results["documents"] else "",
+                    "metadata": results["metadatas"][i] if results["metadatas"] else {},
+                }
+                documents.append(doc)
+
+            return documents
+        except Exception:
+            return []
 
     async def list_collections(self) -> list[str]:
         """List all available collections.

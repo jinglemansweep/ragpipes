@@ -3,7 +3,7 @@
 This package provides a complete RAG implementation with:
 - Document ingestion and processing
 - Vector storage with ChromaDB
-- External embedding clients (OpenAI, Cohere)
+- External embedding client (OpenAI)
 - Pydantic AI agent integration
 - FastAPI web interface
 """

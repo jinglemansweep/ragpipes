@@ -66,7 +66,7 @@ async def app_info():
             "RAG (Retrieval-Augmented Generation)",
             "Pydantic AI integration",
             "ChromaDB vector storage",
-            "External embeddings (OpenAI/Cohere)",
+            "External embeddings (OpenAI)",
             "FastAPI web interface",
             "Document ingestion pipeline",
             "Type-safe responses",

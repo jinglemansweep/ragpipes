@@ -1,7 +1,50 @@
 # RAGPipes Development Agent Instructions
 
 ## Project Overview
-RAGPipes is a Python 3.12 application with Pydantic AI and RAG (Retrieval-Augmented Generation) capabilities. It provides a FastAPI web interface for document ingestion, vector storage, and AI-powered query responses.
+RAGPipes is a Python 3.12 application with Pydantic AI and RAG (Retrieval-Augmented Generation) capabilities. It provides both a FastAPI web interface and a comprehensive CLI for document ingestion, vector storage, and AI-powered query responses.
+
+## Architecture
+
+### Dual Interface Design
+RAGPipes provides two complementary interfaces:
+
+1. **API Server (FastAPI)**: RESTful web interface for programmatic access
+2. **CLI Interface (Click)**: Command-line interface for human operators and automation
+
+### Architecture Diagram
+```
+┌─────────────────┐    HTTP/REST     ┌─────────────────┐
+│   CLI Interface │ ◄──────────────► │  API Server     │
+│   (Client)      │                  │  (FastAPI)      │
+└─────────────────┘                  └─────────┬───────┘
+                                           │
+                            ┌──────────────▼──────────────┐
+                            │        Core Components      │
+                            │  ┌───────────────────────┐ │
+                            │  │ RAGAgent (Pydantic AI)│ │
+                            │  │ RAGRetriever           │ │
+                            │  │ ChromaStore (Vector DB) │ │
+                            │  │ ExternalEmbeddingsClient │ │
+                            │  │ DocumentProcessor      │ │
+                            │  └───────────────────────┘ │
+                            └───────────────────────────────┘
+```
+
+### CLI Architecture
+The CLI is designed as a **client** that communicates with the API server via HTTP requests:
+
+- **RAGPipesAPIClient**: HTTP client wrapper for all API operations
+- **Configuration Management**: Pydantic Settings with env vars and TOML files
+- **Output Formatters**: Rich, Plain, and JSON output for different environments
+- **Environment Detection**: Auto-detects CI/CD environments and adjusts output
+
+### API Architecture
+The API server provides RESTful endpoints with lazy initialization:
+
+- **Global Instances**: Shared components initialized on first use
+- **Error Handling**: Structured HTTP exceptions with proper status codes
+- **Documentation**: Auto-generated OpenAPI/Swagger documentation
+- **Validation**: Pydantic models for request/response validation
 
 ## Development Environment Setup
 
@@ -63,9 +106,15 @@ make check            # Run all quality checks
 src/ragpipes/
 ├── agent/           # Pydantic AI agent implementation
 ├── api/             # FastAPI routes and web interface
-├── embeddings/      # External embedding clients (OpenAI/Cohere)
+├── cli/             # Command-line interface (NEW)
+│   ├── main.py      # CLI entry point and commands
+│   ├── api_client.py # HTTP client for API communication
+│   ├── utils.py     # Output formatters (Rich/Plain/JSON)
+│   └── env.py       # Environment detection utilities
+├── embeddings/      # External embedding client (OpenAI)
 ├── ingestion/       # Document processing pipeline
 ├── rag/             # RAG components (ChromaDB, retriever)
+├── settings.py      # Configuration management (Enhanced)
 └── main.py          # Application entry point
 ```
 
@@ -74,7 +123,11 @@ src/ragpipes/
 - **FastAPI**: Web framework
 - **Pydantic AI**: AI agent framework
 - **ChromaDB**: Vector storage
-- **OpenAI/Cohere**: Embedding providers
+- **OpenAI**: Embedding provider
+- **Click**: CLI framework
+- **Rich**: Terminal formatting and progress bars
+- **httpx**: Async HTTP client for CLI-API communication
+- **Pydantic Settings**: Configuration management
 - **uv**: Package management
 - **ruff**: Linting and formatting
 

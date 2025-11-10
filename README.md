@@ -7,8 +7,9 @@ A Python 3.12 application with Pydantic AI and RAG (Retrieval-Augmented Generati
 - **RAG System**: Complete retrieval-augmented generation pipeline
 - **Pydantic AI**: Type-safe AI agent integration
 - **ChromaDB**: Local vector storage for embeddings
-- **External Embeddings**: Support for OpenAI and Cohere APIs
+- **External Embeddings**: Support for OpenAI API
 - **FastAPI**: Modern web interface with automatic documentation
+- **CLI Interface**: Complete command-line interface for all operations
 - **Document Processing**: Automatic text chunking and ingestion
 - **Type Safety**: Full Pydantic model validation
 - **Production Ready**: Docker deployment, health checks, monitoring
@@ -18,7 +19,7 @@ A Python 3.12 application with Pydantic AI and RAG (Retrieval-Augmented Generati
 ### Prerequisites
 
 - Python 3.12+
-- OpenAI API key or Cohere API key
+- OpenAI API key
 
 ### Installation
 
@@ -47,6 +48,88 @@ make dev
 The API will be available at `http://localhost:8000` with documentation at `http://localhost:8000/docs`.
 
 ## Usage
+
+### Command Line Interface
+
+RAGPipes provides a comprehensive CLI for all operations:
+
+#### Query the RAG System
+```bash
+# Basic query
+ragpipes-cli query "What is Python?"
+
+# With custom parameters
+ragpipes-cli query "What is FastAPI?" --top-k 3 --max-context-length 2000
+
+# Different output formats (using global option)
+ragpipes-cli --output-format json query "Python features"
+ragpipes-cli --output-format plain query "Python vs Java"
+```
+
+#### Document Ingestion
+```bash
+# Ingest text directly
+ragpipes-cli ingest text "Python is a high-level programming language..." --filename "intro.txt"
+
+# Ingest a file
+ragpipes-cli ingest file document.txt
+
+# Ingest entire directory
+ragpipes-cli ingest dir ./examples/sample_documents
+
+# Ingest with custom chunking
+ragpipes-cli ingest text "Long document..." --chunk-size 500 --chunk-overlap 100
+```
+
+#### Document Management
+```bash
+# List document count
+ragpipes-cli docs count
+
+# List all documents with details
+ragpipes-cli docs list
+
+# List limited number of documents
+ragpipes-cli docs list --limit 5
+
+# List documents in JSON format
+ragpipes-cli --output-format json docs list
+
+# Clear all documents
+ragpipes-cli docs clear
+```
+
+#### Server Management
+```bash
+# Start the API server
+ragpipes-cli server start
+
+# Start with custom host/port
+ragpipes-cli server start --host 127.0.0.1 --port 9000
+
+# Start with auto-reload for development
+ragpipes-cli server start --reload
+
+# Start in production mode
+ragpipes-cli server start --host 0.0.0.0 --port 8000
+```
+
+#### CLI Configuration
+```bash
+# Use configuration file
+ragpipes-cli --config ~/.ragpipes.toml query "What is AI?"
+
+# Set output format globally
+ragpipes-cli --output-format json docs list
+
+# Disable colors for CI/CD
+ragpipes-cli --no-color query "test"
+
+# Enable verbose output
+ragpipes-cli --verbose ingest file document.txt
+```
+
+### API Endpoints
 
 ### API Endpoints
 
@@ -96,11 +179,11 @@ async def main():
     vector_store = ChromaStore()
     retriever = RAGRetriever(embeddings_client, vector_store)
     agent = RAGAgent(retriever)
-    
+
     # Query the system
     request = QueryRequest(query="What is Python?")
     response = await agent.query(request)
-    
+
     print(f"Answer: {response.answer}")
     print(f"Sources: {response.sources}")
     print(f"Confidence: {response.confidence}")
@@ -139,6 +222,31 @@ make docker-build
 make docker-up
 ```
 
+### CLI Commands
+
+```bash
+# Show CLI help
+ragpipes-cli --help
+
+# Query with different formats (using global option)
+ragpipes-cli --output-format rich query "What is Python?"
+ragpipes-cli --output-format plain query "What is Python?"
+ragpipes-cli --output-format json query "What is Python?"
+
+# Ingest documents
+ragpipes-cli ingest text "Content" --filename "doc.txt"
+ragpipes-cli ingest file document.txt
+ragpipes-cli ingest dir ./docs
+
+# Document management
+ragpipes-cli docs count
+ragpipes-cli docs list
+ragpipes-cli docs clear
+
+# Start server
+ragpipes-cli server start
+```
+
 ### Project Structure
 
 ```
@@ -146,9 +254,11 @@ ragpipes/
 ├── src/ragpipes/           # Main package
 │   ├── agent/             # Pydantic AI agent
 │   ├── api/               # FastAPI routes
+│   ├── cli/               # Command-line interface
 │   ├── embeddings/        # External embeddings client
 │   ├── ingestion/         # Document processing
 │   ├── rag/              # RAG components
+│   ├── settings.py       # Configuration management
 │   └── main.py           # Application entry point
 ├── tests/                # Test suite
 ├── examples/              # Sample documents
@@ -165,7 +275,7 @@ ragpipes/
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `OPENAI_API_KEY` | OpenAI API key | Required |
-| `COHERE_API_KEY` | Cohere API key | Optional |
+
 | `EMBEDDINGS_PROVIDER` | Embeddings provider | `openai` |
 | `CHROMA_DB_PATH` | ChromaDB storage path | `./data/chroma` |
 | `PORT` | Server port | `8000` |
@@ -173,10 +283,46 @@ ragpipes/
 | `RAG_TOP_K` | Number of documents to retrieve | `5` |
 | `RAG_SIMILARITY_THRESHOLD` | Minimum similarity score | `0.7` |
 | `RAG_MAX_CONTEXT_LENGTH` | Maximum context length | `4000` |
+| `CLI_SERVER_HOST` | CLI API server host | `localhost` |
+| `CLI_SERVER_PORT` | CLI API server port | `8000` |
+| `CLI_SERVER_SCHEME` | CLI API server scheme | `http` |
+| `VERBOSE` | Enable verbose output | `false` |
+
+### Configuration Files
+
+You can use TOML configuration files instead of environment variables:
+
+```toml
+# ~/.ragpipes.toml or .ragpipes.toml
+[api]
+openai_api_key = "your-api-key"
+embeddings_provider = "openai"
+
+[server]
+host = "0.0.0.0"
+port = 8000
+
+[query]
+default_top_k = 5
+max_context_length = 4000
+
+[cli]
+output_format = "rich"
+verbose = false
+
+[cli_server]
+host = "localhost"
+port = 8000
+scheme = "http"
+```
+
+Use with: `ragpipes-cli --config ~/.ragpipes.toml query "What is Python?"`
 
 ## Deployment
 
 ### Docker
+
+The Docker container runs the API server by default on port 8000.
 
 ```bash
 # Build image
@@ -191,6 +337,8 @@ make docker-logs
 # Stop services
 make docker-down
 ```
+
+The API will be available at `http://localhost:8000` with health check at `http://localhost:8000/api/v1/health`.
 
 ### Production
 

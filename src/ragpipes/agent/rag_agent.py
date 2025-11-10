@@ -74,9 +74,9 @@ class RAGAgent:
         """Get the system prompt for the agent."""
         return """
         You are a helpful AI assistant with access to a knowledge base through RAG (Retrieval-Augmented Generation).
-        
+
         Your task is to answer questions based on the provided context. Follow these guidelines:
-        
+
         1. Use the provided context to answer questions accurately
         2. Always cite your sources by listing the filenames or document IDs
         3. Indicate your confidence level in the answer (0.0-1.0)
@@ -84,7 +84,7 @@ class RAGAgent:
         5. If you need to make assumptions, state them explicitly
         6. Provide concise but complete answers
         7. If multiple sources provide conflicting information, acknowledge the conflict
-        
+
         Format your response as a structured answer with sources, confidence, and context usage information.
         """
 
@@ -119,16 +119,16 @@ class RAGAgent:
                 prompt = f"""
                 Context Information:
                 {context}
-                
+
                 User Question: {request.query}
-                
+
                 Please answer the question based on the provided context. Include your sources, confidence level, and indicate whether you used the context.
                 """
                 context_used = True
             else:
                 prompt = f"""
                 User Question: {request.query}
-                
+
                 No relevant context was found. Please answer based on your general knowledge, but indicate that no specific context was available.
                 """
                 context_used = False
@@ -180,9 +180,9 @@ class RAGAgent:
         # Create summary prompt
         prompt = f"""
         Please summarize the following document and extract the key points:
-        
+
         {content}
-        
+
         Provide a concise summary and list the main key points.
         """
 
@@ -215,9 +215,9 @@ class RAGAgent:
         Previous Question: {original_query}
         Previous Answer: {previous_response.answer}
         Previous Sources: {", ".join(previous_response.sources)}
-        
+
         Followup Question: {followup_query}
-        
+
         Please answer the followup question, taking into account the previous conversation context.
         """
 

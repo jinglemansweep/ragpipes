@@ -140,22 +140,15 @@ async def ingest_file(file: UploadFile = File(...)):
         Ingestion result
     """
     try:
-        # Check file size (limit to 50MB)
-        file_size = 0
-        content = b""
-
-        async for chunk in file.file:
-            file_size += len(chunk)
-            if file_size > 50 * 1024 * 1024:  # 50MB limit
-                raise HTTPException(status_code=413, detail="File too large")
-            content += chunk
-
-        # Reset file pointer
-        await file.file.seek(0)
-
-        # Read content as text
+        # Read file content
         try:
+            content = await file.read()
             text_content = content.decode("utf-8")
+
+            # Check file size (limit to 50MB)
+            if len(content) > 50 * 1024 * 1024:  # 50MB limit
+                raise HTTPException(status_code=413, detail="File too large")
+
         except UnicodeDecodeError as e:
             raise HTTPException(
                 status_code=400, detail="File must be UTF-8 encoded text"
@@ -257,14 +250,19 @@ async def list_documents():
     """List all documents in the vector store.
 
     Returns:
-        Document count and collection info
+        Document count, collection info, and document list
     """
     try:
         _, vector_store_instance, _, _, _ = get_instances()
         count = await vector_store_instance.count_documents()
         collection_info = vector_store_instance.get_collection_info()
+        documents = await vector_store_instance.list_documents()
 
-        return {"total_documents": count, "collection_info": collection_info}
+        return {
+            "total_documents": count,
+            "collection_info": collection_info,
+            "documents": documents,
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from None
 
@@ -317,6 +315,39 @@ async def delete_document(document_id: str):
             raise HTTPException(status_code=500, detail="Failed to delete document")
     except HTTPException:
         raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None
+
+
+@router.delete("/documents")
+async def clear_all_documents():
+    """Clear all documents from the vector store.
+
+    Returns:
+        Clear result
+    """
+    try:
+        import shutil
+
+        from ..settings import load_settings
+
+        settings = load_settings()
+        chroma_path = settings.chroma_db_path
+
+        # Remove ChromaDB directory
+        if os.path.exists(chroma_path):
+            shutil.rmtree(chroma_path)
+            os.makedirs(chroma_path, exist_ok=True)
+
+        # Re-initialize all global instances
+        global embeddings_client, vector_store, retriever, agent, processor
+        embeddings_client = None
+        vector_store = None
+        retriever = None
+        agent = None
+        processor = None
+
+        return {"message": "All documents cleared successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from None
 

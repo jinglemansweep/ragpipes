@@ -5,7 +5,10 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH="/app/src" \
-    CHROMA_DB_PATH="/app/data/chroma"
+    CHROMA_DB_PATH="/app/data/chroma" \
+    HOST=0.0.0.0 \
+    PORT=8000 \
+    ENVIRONMENT=production
 
 # Create app directory
 WORKDIR /app
@@ -16,8 +19,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY pyproject.toml ./
+# Copy requirements first for better caching
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
+
+# Install Python dependencies (this layer will be cached if pyproject.toml doesn't change)
 RUN pip install --no-cache-dir -e .
 
 # Create non-root user
@@ -28,15 +34,12 @@ USER app
 # Create data directory for ChromaDB
 RUN mkdir -p /app/data/chroma
 
-# Copy application code
-COPY --chown=app:app src/ ./src/
-
 # Expose port
 EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:8000/api/v1/health || exit 1
 
 # Run the application
-CMD ["uvicorn", "ragpipes.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "src.ragpipes.main:app", "--host", "0.0.0.0", "--port", "8000"]

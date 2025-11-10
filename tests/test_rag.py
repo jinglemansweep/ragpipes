@@ -1,9 +1,9 @@
 """Tests for ChromaDB store."""
 
-import pytest
-import tempfile
 import shutil
-from unittest.mock import patch, MagicMock
+import tempfile
+
+import pytest
 
 from ragpipes.rag.chroma_store import ChromaStore
 
