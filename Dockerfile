@@ -50,3 +50,6 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 
 # Run the application using virtual environment
 CMD ["/opt/venv/bin/python", "-m", "uvicorn", "src.ragpipes.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Labels
+LABEL org.opencontainers.image.source=https://github.com/jinglemansweep/ragpipes
